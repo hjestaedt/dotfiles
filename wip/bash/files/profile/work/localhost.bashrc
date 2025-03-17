@@ -6,11 +6,9 @@ command_exists starship && eval "$(starship init bash)"
 command_exists thefuck && eval "$(thefuck --alias)"
 
 # variables
-JAVA_HOME="$HOME/opt/sdk/jdk-17"
 DOCKER_HOST="unix://$HOME/.colima/default/docker.sock"
-TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/var/run/docker.sock
 JQ_COLORS="0;90:0;39:0;39:0;39:0;32:1;39:1;39:1;34"
-export DOCKER_HOST TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE JAVA_HOME JQ_COLORS SHELL_CONFIG
+export DOCKER_HOST JQ_COLORS SHELL_CONFIG
 
 # path
 PATH="$JAVA_HOME/bin:$PATH"

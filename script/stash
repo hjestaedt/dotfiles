@@ -1,0 +1,901 @@
+#!/usr/bin/env bash
+#
+# stash - A utility to temporarily store and restore files and directories
+# Similar concept to git stash but for general files and directories
+#
+# Usage: stash <command> [options]
+# See 'stash help' for more information
+#
+# Version: 1.2 - Improved from original 1.1 with enhanced security and performance
+
+# Fail on errors, undefined variables, and pipe failures
+set -euo pipefail
+
+# Configuration
+readonly STASH_DIR="${HOME}/var/stash"
+readonly LOCK_FILE="${STASH_DIR}/.lock"
+SCRIPT_NAME=$(basename "$0")
+readonly SCRIPT_NAME
+readonly VERSION="1.2"
+readonly LOG_FILE="${STASH_DIR}/stash.log"
+
+# Ensure stash directory exists
+mkdir -p "${STASH_DIR}"
+
+# Log message to the log file
+log_message() {
+    local level="$1"
+    local msg="$2"
+    local timestamp
+    
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    echo "[$timestamp] [$level] $msg" >> "$LOG_FILE"
+}
+
+# Print error messages to stderr and log
+error() {
+    echo "[ERROR] $*" >&2
+    log_message "ERROR" "$*"
+    return 1
+}
+
+# Print fatal error messages and exit
+fatal_error() {
+    error "$*"
+    exit 1
+}
+
+# Print warning messages to stderr and log
+warn() {
+    echo "[WARNING] $*" >&2
+    log_message "WARNING" "$*"
+}
+
+# Print info messages to stdout and log
+info() {
+    echo "$*"
+    log_message "INFO" "$*"
+}
+
+# Debug messages (only when debug mode is enabled)
+debug() {
+    if [[ "${DEBUG:-0}" -eq 1 ]]; then
+        echo "[DEBUG] $*" >&2
+        log_message "DEBUG" "$*"
+    fi
+}
+
+# Acquire a lock to prevent race conditions
+acquire_lock() {
+    local retries=10
+    local wait_time=0.5
+    
+    mkdir -p "$(dirname "$LOCK_FILE")"
+    
+    while [[ $retries -gt 0 ]]; do
+        if mkdir "$LOCK_FILE" 2>/dev/null; then
+            echo "$$" > "${LOCK_FILE}/pid"
+            debug "Lock acquired by PID $$"
+            return 0
+        fi
+        
+        # Check if the lock is stale
+        if [[ -f "${LOCK_FILE}/pid" ]]; then
+            local lock_pid
+            lock_pid=$(<"${LOCK_FILE}/pid")
+            if ! kill -0 "$lock_pid" 2>/dev/null; then
+                warn "Removing stale lock from PID $lock_pid"
+                rm -rf "$LOCK_FILE"
+                continue
+            fi
+        fi
+        
+        debug "Waiting for lock (retries left: $retries)"
+        sleep "$wait_time"
+        retries=$((retries - 1))
+    done
+    
+    error "Could not acquire lock after multiple attempts. Another instance might be running."
+    return 1
+}
+
+# Release the lock
+release_lock() {
+    if [[ -d "$LOCK_FILE" ]]; then
+        debug "Releasing lock by PID $$"
+        rm -rf "$LOCK_FILE" 2>/dev/null || true
+    fi
+}
+
+# Ensure lock is released when script exits
+cleanup() {
+    release_lock
+    debug "Cleanup completed for PID $$"
+}
+
+# Set up better trap handling for signals
+trap 'cleanup; exit 130' INT
+trap 'cleanup; exit 143' TERM
+trap cleanup EXIT
+
+# Print usage information
+usage() {
+    cat << EOF
+Usage: $SCRIPT_NAME <command> [options]
+
+Commands:
+  save <file1> [file2...] [-m "message"]  - Stash files/directories with optional message
+  list                                   - List all stashed items
+  show <stash-id>                        - Show contents of a specific stash
+  apply <stash-id>                       - Restore a stashed item to its original location
+  drop <stash-id>                        - Remove a specific stash
+  clear                                  - Remove all stashes
+  help                                   - Display this help message
+  version                                - Show version information
+
+Options:
+  -m, --message "message"                - Add a description when saving a stash
+  -c, --copy                             - Copy files instead of moving them (for save command)
+  -z, --compress                         - Compress the stashed content (for save command)
+  -v, --verbose                          - Show verbose output
+  -d, --debug                            - Enable debug output (very verbose)
+
+Examples:
+  $SCRIPT_NAME save file1.txt src/ -m "Work in progress"
+  $SCRIPT_NAME save --copy important.txt -m "Keep a copy"
+  $SCRIPT_NAME list
+  $SCRIPT_NAME show 1         # Show stash by number
+  $SCRIPT_NAME apply stash-20250315-123456  # Apply by ID
+  $SCRIPT_NAME drop 2         # Drop stash by number
+  $SCRIPT_NAME clear
+
+Notes:
+  - Stash IDs can be referenced by number (1, 2, 3) or full ID (stash-YYYYMMDD-HHMMSS)
+  - The current directory ('.') cannot be stashed directly
+  - By default, files are MOVED to the stash. Use --copy to keep originals.
+EOF
+    return 0
+}
+
+# Safely get the real path of a file with bash builtins where possible
+safe_realpath() {
+    local path="$1"
+    local resolved
+    
+    # Try using realpath if available
+    if command -v realpath >/dev/null 2>&1; then
+        resolved=$(realpath -e "$path" 2>/dev/null) || {
+            error "Path does not exist: $path"
+            return 1
+        }
+    else
+        # Fallback for systems without realpath
+        if [[ ! -e "$path" ]]; then
+            error "Path does not exist: $path"
+            return 1
+        fi
+        
+        # Handle absolute paths
+        if [[ "${path:0:1}" = "/" ]]; then
+            resolved="$path"
+        else
+            # Handle relative paths
+            resolved="$(pwd)/$path"
+        fi
+        
+        # Normalize path (basic implementation)
+        # This could be enhanced with more bash-native path normalization
+        resolved=$(echo "$resolved" | sed -e 's/\/\.\//\//g' -e 's/\/[^\/]*\/\.\.\//\//g')
+    fi
+    
+    echo "$resolved"
+    return 0
+}
+
+# Check if a path is safe to stash
+is_safe_path() {
+    local path="$1"
+    local abs_path
+    
+    # Get absolute path safely
+    abs_path=$(safe_realpath "$path") || return 1
+    
+    # Prevent stashing the current directory
+    if [[ "$abs_path" = "$(pwd)" ]]; then
+        error "Stashing the current directory is not allowed."
+        return 1
+    fi
+    
+    # Prevent stashing the stash directory itself
+    if [[ "$abs_path" = "$STASH_DIR" || "$abs_path" = "${STASH_DIR}/"* ]]; then
+        error "Cannot stash the stash directory or its contents."
+        return 1
+    fi
+    
+    # Comprehensive system directory check
+    local system_dirs=(
+        "/bin" "/sbin" "/usr/bin" "/usr/sbin" "/etc" "/var"
+        "/lib" "/lib64" "/usr/lib" "/usr/lib64" "/boot" "/dev"
+        "/proc" "/sys" "/tmp" "/run" "/opt" "/srv" "/root"
+    )
+    
+    for dir in "${system_dirs[@]}"; do
+        if [[ "$abs_path" = "$dir" || "$abs_path" = "${dir}/"* ]]; then
+            error "Stashing system directories ($dir) is not allowed."
+            return 1
+        fi
+    done
+    
+    # Additional sensitive paths
+    if [[ "$abs_path" = "/home" ]]; then
+        error "Stashing the entire /home directory is not allowed."
+        return 1
+    fi
+    
+    # Check for symbolic links
+    if [[ -L "$path" ]]; then
+        warn "Note: '$path' is a symbolic link. Only the link will be stashed, not its target."
+    fi
+    
+    return 0
+}
+
+# Get all stashes sorted by date - improved for better atomicity
+get_sorted_stashes() {
+    local stash_dirs=()
+    
+    # Check if stash directory exists
+    if [[ ! -d "$STASH_DIR" ]]; then
+        debug "Stash directory does not exist yet"
+        return 0
+    fi
+    
+    # Use nullglob to avoid errors if no matches are found
+    shopt -s nullglob
+    stash_dirs=("${STASH_DIR}"/stash-*)
+    shopt -u nullglob
+    
+    # Return early if no stashes found
+    if [[ ${#stash_dirs[@]} -eq 0 ]]; then
+        debug "No stashes found"
+        return 0
+    fi
+    
+    # Sort stashes by name (which is date-based)
+    # Use a more efficient sorting method
+    if [[ "${#stash_dirs[@]}" -gt 0 ]]; then
+        printf '%s\n' "${stash_dirs[@]}" | sort
+    fi
+}
+
+# Resolve stash ID from number or full ID
+resolve_stash_id() {
+    local input="$1"
+    
+    # Return empty if input is empty
+    if [[ -z "$input" ]]; then
+        error "Empty stash ID provided."
+        return 1
+    fi
+    
+    # If it's a number, lookup the corresponding stash
+    if [[ "$input" =~ ^[0-9]+$ ]]; then
+        local sorted_stashes=()
+        
+        # Get sorted stashes - more atomically
+        mapfile -t sorted_stashes < <(get_sorted_stashes)
+        
+        # Check if we have any stashes at all
+        if [[ "${#sorted_stashes[@]}" -eq 0 ]]; then
+            error "No stashes found."
+            return 1
+        # Adjust for 1-based indexing
+        else
+            local index=$(( input - 1 ))
+            
+            # Check if index is valid
+            if [[ "$index" -ge 0 && "$index" -lt "${#sorted_stashes[@]}" ]]; then
+                # Use parameter expansion for basename
+                echo "${sorted_stashes[$index]##*/}"
+                return 0
+            else
+                error "Invalid stash number: $input. Valid range is 1-${#sorted_stashes[@]}."
+                return 1
+            fi
+        fi
+    else
+        # Check if the ID exists - validate format first
+        if [[ ! "$input" =~ ^stash-[0-9]{8}-[0-9]{6}$ ]]; then
+            error "Invalid stash ID format: $input. Expected format: stash-YYYYMMDD-HHMMSS"
+            return 1
+        fi
+        
+        if [[ ! -d "${STASH_DIR}/$input" ]]; then
+            error "Stash ID not found: $input"
+            return 1
+        fi
+        
+        # Return the ID as is
+        echo "$input"
+        return 0
+    fi
+}
+
+# Validate user input for security
+validate_input() {
+    local input="$1"
+    local type="$2" # message, path, etc.
+    
+    case "$type" in
+        message)
+            # Check for control characters
+            if [[ "$input" =~ [[:cntrl:]]+ ]]; then
+                error "Message contains invalid control characters."
+                return 1
+            fi
+            ;;
+        path)
+            # Additional path validations could be added here
+            ;;
+        *)
+            # Default validation
+            ;;
+    esac
+    
+    return 0
+}
+
+# Save files/directories to a stash
+save_stash() {
+    local message=""
+    local items=()
+    local compress=0
+    local copy_files=0  # Default is to move
+    local verbose=0
+    
+    # Parse arguments to separate files from options
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            -m|--message)
+                shift
+                if [[ $# -eq 0 ]]; then
+                    error "No message provided after -m/--message option."
+                    return 1
+                fi
+                message="$1"
+                # Validate message
+                validate_input "$message" "message" || return 1
+                shift
+                ;;
+            -z|--compress)
+                compress=1
+                shift
+                ;;
+            -c|--copy)
+                copy_files=1
+                shift
+                ;;
+            -v|--verbose)
+                verbose=1
+                shift
+                ;;
+            -d|--debug)
+                export DEBUG=1
+                shift
+                ;;
+            -*)
+                error "Unknown option: $1"
+                echo "Use 'stash help' to see available options."
+                return 1
+                ;;
+            *)
+                items+=("$1")
+                shift
+                ;;
+        esac
+    done
+    
+    # Check if we have files to stash
+    if [[ ${#items[@]} -eq 0 ]]; then
+        error "No files or directories specified to stash."
+        echo "Usage: stash save <file1> [file2...] [-m \"message\"]"
+        return 1
+    fi
+    
+    # Generate a unique stash ID based on date and time
+    local stash_id
+    stash_id="stash-$(date +%Y%m%d-%H%M%S)"
+    local stash_path="${STASH_DIR}/${stash_id}"
+    
+    # Initialize flag to track if any items were successfully stashed
+    local any_valid_items=0
+    
+    # First, check if any items are valid to stash before creating the stash directory
+    for item in "${items[@]}"; do
+        # Skip empty items
+        [[ -z "$item" ]] && continue
+        
+        # Reject stashing the current directory
+        if [[ "$item" = "." ]]; then
+            error "Stashing the current directory ('.') is not allowed."
+            continue
+        fi
+        
+        # Check if item exists
+        if [[ -e "$item" ]]; then
+            # Check if it's safe to stash
+            if is_safe_path "$item"; then
+                any_valid_items=1
+                break
+            fi
+        else
+            warn "'$item' does not exist, skipping."
+        fi
+    done
+    
+    # Only continue if we have valid items to stash
+    if [[ $any_valid_items -eq 0 ]]; then
+        error "No valid files to stash. Operation aborted."
+        return 1
+    fi
+    
+    # Acquire lock
+    acquire_lock || return 1
+    
+    # Now create the stash directory since we have valid items
+    mkdir -p "${stash_path}/content"
+    
+    # Set default message if not provided
+    if [[ -z "$message" ]]; then
+        message="Stashed on $(date)"
+    fi
+    
+    # Save the message
+    echo "$message" > "${stash_path}/description"
+    
+    # Save whether content is compressed
+    echo "$compress" > "${stash_path}/compressed"
+    
+    # Process all items
+    local success=0
+    for item in "${items[@]}"; do
+        # Skip empty items
+        [[ -z "$item" ]] && continue
+        
+        # Reject stashing the current directory
+        if [[ "$item" = "." ]]; then
+            error "Stashing the current directory ('.') is not allowed."
+            continue
+        fi
+        
+        # Check if item exists
+        if [[ -e "$item" ]]; then
+            # Check if it's safe to stash
+            if ! is_safe_path "$item"; then
+                continue
+            fi
+            
+            # Get absolute path
+            local abs_path
+            abs_path=$(safe_realpath "$item") || continue
+            
+            # Save original path information using parameter expansion
+            local base_name dir_name
+            base_name="${abs_path##*/}"
+            dir_name="${abs_path%/$base_name}"
+            
+            # Store with consistent path format
+            echo "${dir_name}/${base_name}" >> "${stash_path}/paths"
+            
+            if [[ $compress -eq 1 ]]; then
+                if [[ $verbose -eq 1 ]]; then
+                    info "Compressing: $item"
+                fi
+                
+                # Create a tarball
+                local tar_file="${stash_path}/content/${base_name}.tar.gz"
+                if ! tar -czf "$tar_file" -C "$dir_name" "$base_name"; then
+                    error "Failed to compress: $item"
+                    continue
+                fi
+                
+                # Remove original unless copy mode is requested
+                if [[ $copy_files -eq 0 && -f "$tar_file" ]]; then
+                    if [[ $verbose -eq 1 ]]; then
+                        info "Removing original: $item"
+                    fi
+                    rm -rf "$abs_path"
+                fi
+            else
+                # Regular operation - move by default, copy if requested
+                if [[ $copy_files -eq 1 ]]; then
+                    if [[ $verbose -eq 1 ]]; then
+                        info "Copying: $item"
+                    fi
+                    cp -a "$abs_path" "${stash_path}/content/" || {
+                        error "Failed to copy: $item"
+                        continue
+                    }
+                else
+                    if [[ $verbose -eq 1 ]]; then
+                        info "Moving: $item"
+                    fi
+                    mv -f "$abs_path" "${stash_path}/content/" || {
+                        error "Failed to move: $item"
+                        continue
+                    }
+                fi
+            fi
+            
+            # Record the operation mode
+            echo "$copy_files" > "${stash_path}/copy_mode"
+            
+            info "Stashed: $item"
+            success=1
+        else
+            warn "'$item' does not exist, skipping."
+        fi
+    done
+    
+    # Handle success or failure
+    if [[ $success -eq 1 ]]; then
+        info "Stashed as: $stash_id"
+        info "Description: $message"
+    else
+        # Clean up if no files were stashed
+        rm -rf "${stash_path}"
+        error "No files were stashed."
+        return 1
+    fi
+    
+    return 0
+}
+
+# List all stashes
+list_stash() {
+    local sorted_stashes=()
+    
+    # Get sorted stashes
+    mapfile -t sorted_stashes < <(get_sorted_stashes)
+    
+    # Check if we have any stashes
+    if [[ ${#sorted_stashes[@]} -eq 0 ]]; then
+        info "No stashes found."
+        return 0
+    fi
+    
+    info "Available stashes:"
+    local idx=1
+    for stash in "${sorted_stashes[@]}"; do
+        if [[ -d "$stash" ]]; then
+            local stash_id description
+            # Use parameter expansion instead of basename
+            stash_id="${stash##*/}"
+            
+            # Read description
+            if [[ -f "$stash/description" ]]; then
+                description=$(<"$stash/description")
+            else
+                description="No description"
+            fi
+            
+            # Check if stash was created with copy mode
+            local copy_mode=""
+            if [[ -f "$stash/copy_mode" && "$(<"$stash/copy_mode")" -eq 1 ]]; then
+                copy_mode=" [copied]"
+            fi
+            
+            # Check if stash is compressed
+            local compressed=""
+            if [[ -f "$stash/compressed" && "$(<"$stash/compressed")" -eq 1 ]]; then
+                compressed=" [compressed]"
+            fi
+            
+            info "  $idx: $stash_id: $description$copy_mode$compressed"
+            idx=$((idx+1))
+        fi
+    done
+    
+    return 0
+}
+
+# Show contents of a specific stash
+show_stash() {
+    if [[ -z "${1:-}" ]]; then
+        error "No stash ID specified."
+        echo "Usage: stash show <stash-id>"
+        return 1
+    fi
+    
+    local resolved_id
+    resolved_id=$(resolve_stash_id "$1") || return 1
+    
+    local stash_path="${STASH_DIR}/$resolved_id"
+    
+    # Check if stash exists
+    if [[ ! -d "${stash_path}" ]]; then
+        error "Stash '$resolved_id' not found."
+        return 1
+    fi
+    
+    # Show stash information
+    local description
+    if [[ -f "${stash_path}/description" ]]; then
+        description=$(<"${stash_path}/description")
+    else
+        description="No description"
+    fi
+    
+    info "Stash: $resolved_id"
+    info "Description: $description"
+    
+    # Check if stash was created with copy mode
+    if [[ -f "${stash_path}/copy_mode" && "$(<"${stash_path}/copy_mode")" -eq 1 ]]; then
+        info "Mode: Copy (originals were kept)"
+    else
+        info "Mode: Move (originals were removed)"
+    fi
+    
+    # Check if stash is compressed
+    local compressed=0
+    if [[ -f "${stash_path}/compressed" ]]; then
+        compressed=$(<"${stash_path}/compressed")
+        if [[ $compressed -eq 1 ]]; then
+            info "Storage: Compressed"
+        fi
+    fi
+    
+    info "Contents:"
+    
+    # List all files and directories in the stash
+    if [[ -d "${stash_path}/content" ]]; then
+        if [[ $compressed -eq 1 ]]; then
+            # List compressed files
+            if [[ -n "$(ls -A "${stash_path}/content" 2>/dev/null)" ]]; then
+                for file in "${stash_path}/content"/*.tar.gz; do
+                    [[ -f "$file" ]] || continue
+                    local base_name
+                    base_name="${file##*/}"
+                    base_name="${base_name%.tar.gz}"
+                    info "  [COMPRESSED] $base_name"
+                done
+            else
+                info "  No content found in stash."
+            fi
+        else
+            # List regular files and directories
+            if [[ -n "$(ls -A "${stash_path}/content" 2>/dev/null)" ]]; then
+                # More portable version using bash
+                while IFS= read -r -d '' entry; do
+                    if [[ -f "$entry" ]]; then
+                        info "  [FILE] ${entry#${stash_path}/content/}"
+                    elif [[ -d "$entry" ]]; then
+                        info "  [DIR] ${entry#${stash_path}/content/}"
+                    fi
+                done < <(find "${stash_path}/content" -mindepth 1 -print0 2>/dev/null)
+            else
+                info "  No content found in stash."
+            fi
+        fi
+    else
+        info "  No content directory found in stash."
+    fi
+    
+    # Show original paths
+    if [[ -f "${stash_path}/paths" && -s "${stash_path}/paths" ]]; then
+        info "Original paths:"
+        while IFS= read -r path; do
+            info "  $path"
+        done < "${stash_path}/paths"
+    fi
+    
+    return 0
+}
+
+# Apply/restore a stash
+apply_stash() {
+    if [[ -z "${1:-}" ]]; then
+        error "No stash ID specified."
+        echo "Usage: stash apply <stash-id>"
+        return 1
+    fi
+    
+    local resolved_id
+    resolved_id=$(resolve_stash_id "$1") || return 1
+    
+    local stash_path="${STASH_DIR}/$resolved_id"
+    
+    # Check if stash exists
+    if [[ ! -d "${stash_path}" ]]; then
+        error "Stash '$resolved_id' not found."
+        return 1
+    fi
+    
+    # Check if paths file exists
+    if [[ ! -f "${stash_path}/paths" || ! -s "${stash_path}/paths" ]]; then
+        error "Path information for stash '$resolved_id' is missing or empty."
+        return 1
+    fi
+    
+    # Acquire lock
+    acquire_lock || return 1
+    
+    # Check if stash is compressed
+    local compressed=0
+    if [[ -f "${stash_path}/compressed" ]]; then
+        compressed=$(<"${stash_path}/compressed")
+    fi
+    
+    # Restore items to their original locations
+    local restored=0
+    while IFS= read -r original_path; do
+        local base_name dir_name
+        base_name="${original_path##*/}"
+        dir_name="${original_path%/$base_name}"
+        
+        # Create directory structure if it doesn't exist
+        if ! mkdir -p "$dir_name"; then
+            error "Failed to create directory: $dir_name"
+            continue
+        fi
+        
+        # Check if the destination already exists
+        if [[ -e "$original_path" ]]; then
+            warn "'$original_path' already exists. Skipping restoration."
+            continue
+        fi
+        
+        if [[ $compressed -eq 1 ]]; then
+            # Handle compressed files
+            local source_path="${stash_path}/content/${base_name}.tar.gz"
+            
+            if [[ -f "$source_path" ]]; then
+                if tar -xzf "$source_path" -C "$dir_name"; then
+                    info "Restored: $original_path (decompressed)"
+                    restored=1
+                else
+                    error "Failed to decompress: $original_path"
+                fi
+            else
+                warn "'${base_name}.tar.gz' not found in stash."
+            fi
+        else
+            # Handle regular files
+            local source_path="${stash_path}/content/${base_name}"
+            
+            if [[ -e "$source_path" ]]; then
+                if cp -a "$source_path" "$original_path"; then
+                    info "Restored: $original_path"
+                    restored=1
+                else
+                    error "Failed to restore: $original_path"
+                fi
+            else
+                warn "'$base_name' not found in stash."
+            fi
+        fi
+    done < "${stash_path}/paths"
+    
+    # Ask if user wants to drop the stash
+    if [[ "$restored" -eq 1 ]]; then
+        echo ""
+        echo "Do you want to drop stash '$resolved_id'? [y/N]"
+        read -r confirm
+        if [[ "$confirm" =~ ^[Yy] ]]; then
+            rm -rf "${stash_path}"
+            info "Stash '$resolved_id' has been dropped."
+        else
+            info "Stash '$resolved_id' kept."
+        fi
+    else
+        warn "No items from stash '$resolved_id' were restored."
+    fi
+    
+    return 0
+}
+
+# Remove a specific stash
+drop_stash() {
+    if [[ -z "${1:-}" ]]; then
+        error "No stash ID specified."
+        echo "Usage: stash drop <stash-id>"
+        return 1
+    fi
+    
+    local resolved_id
+    resolved_id=$(resolve_stash_id "$1") || return 1
+    
+    local stash_path="${STASH_DIR}/$resolved_id"
+    
+    # Check if stash exists
+    if [[ ! -d "${stash_path}" ]]; then
+        error "Stash '$resolved_id' not found."
+        return 1
+    fi
+    
+    # Acquire lock
+    acquire_lock || return 1
+    
+    # Remove the stash
+    if rm -rf "${stash_path}"; then
+        info "Stash '$resolved_id' has been dropped."
+    else
+        error "Failed to drop stash '$resolved_id'."
+        return 1
+    fi
+    
+    return 0
+}
+
+# Remove all stashes
+clear_stashes() {
+    local sorted_stashes=()
+    
+    # Get sorted stashes
+    mapfile -t sorted_stashes < <(get_sorted_stashes)
+    
+    # Check if we have any stashes
+    if [[ ${#sorted_stashes[@]} -eq 0 ]]; then
+        info "No stashes found."
+        return 0
+    fi
+    
+    # Acquire lock
+    acquire_lock || return 1
+    
+    # Ask for confirmation
+    echo "Are you sure you want to remove all stashes? [y/N]"
+    read -r confirm
+    if [[ "$confirm" =~ ^[Yy] ]]; then
+        if rm -rf "${STASH_DIR}"/stash-*; then
+            info "All stashes have been removed."
+        else
+            error "Failed to remove all stashes."
+            return 1
+        fi
+    else
+        info "Operation cancelled."
+    fi
+    
+    return 0
+}
+
+# Main script logic
+case "${1:-}" in
+    save)
+        shift
+        save_stash "$@"
+        ;;
+    list)
+        list_stash
+        ;;
+    show)
+        show_stash "${2:-}"
+        ;;
+    apply)
+        apply_stash "${2:-}"
+        ;;
+    drop)
+        drop_stash "${2:-}"
+        ;;
+    clear)
+        clear_stashes
+        ;;
+    help|--help|-h)
+        usage
+        ;;
+    version|--version|-v)
+        echo "$SCRIPT_NAME version $VERSION"
+        ;;
+    *)
+        if [[ -z "${1:-}" ]]; then
+            error "No command specified."
+        else
+            error "Unknown command '$1'"
+        fi
+        usage
+        exit 1
+        ;;
+esac
+
+exit 0
