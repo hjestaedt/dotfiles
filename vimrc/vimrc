@@ -1,0 +1,39 @@
+" enable syntax highlighting
+syntax on
+
+" enable file type detection and plugins
+filetype plugin indent on
+
+" fix broken backspace
+set backspace=indent,eol,start
+
+" default indentation (2 spaces)
+set expandtab
+set shiftwidth=2
+set softtabstop=2
+set tabstop=2
+
+" display settings
+set ruler
+set rulerformat=%l,%v
+" set number
+
+" search improvements
+set hlsearch
+set incsearch
+
+" file-specific settings
+augroup FileTypeSettings
+    autocmd!
+    " makefiles require tabs
+    autocmd FileType make setlocal tabstop=4 shiftwidth=4 softtabstop=0 noexpandtab
+
+    " shell scripts
+    autocmd FileType sh,bash,zsh setlocal tabstop=4 shiftwidth=4 softtabstop=0 noexpandtab
+
+    " Python: 4 spaces (PEP 8 compliant)
+    autocmd FileType python setlocal tabstop=4 shiftwidth=4 softtabstop=4 expandtab
+
+    " Git commit message width
+    autocmd FileType gitcommit setlocal textwidth=72
+augroup END

@@ -1,0 +1,3 @@
+# tools
+rg
+glow

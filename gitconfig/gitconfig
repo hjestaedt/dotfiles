@@ -1,0 +1,64 @@
+[user]
+    name = Holger Jestaedt
+    email = <your-email>    
+    signingkey = ~/.ssh/config.d/git/<key-filename>.pub
+
+[gpg]
+    format = ssh
+
+[init]
+    defaultBranch = main
+
+[core]
+    editor = vim
+    excludesfile = ~/.gitignore
+    autocrlf = input
+
+[commit]
+    # gpgsign = true  
+
+[push]
+    default = simple
+
+[pull]
+    ff = only
+    # rebase = false
+
+[diff]
+    tool = vimdiff
+
+[merge]
+    tool = vimdiff
+
+[color]
+    ui = true
+
+[color "branch"]
+    current = green bold
+    local = green
+    remote = red
+
+[color "status"]
+    added = green
+    changed = yellow
+    untracked = red
+
+[color "diff"]
+    meta = yellow
+    frag = cyan
+    old = red
+    new = green
+
+[alias]
+    st = status
+    co = checkout
+    br = branch
+    ci = commit
+
+    unstage = reset HEAD --
+    last = log -1 HEAD
+    visual = !gitk
+    
+    lg = log --oneline --graph --decorate --all
+    lol = log --graph --decorate --pretty=oneline --abbrev-commit
+    lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
