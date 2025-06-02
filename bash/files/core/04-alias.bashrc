@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-alias fal='alias | grep -i'
 
 # navigation
 alias ..='cd ..'
@@ -45,8 +44,9 @@ alias vi='vim'
 alias cl='clear'
 alias h='history'
 alias path='echo -e ${PATH//:/\\n}'
-alias envgrep='env | grep -i'
-alias hisgrep='history | grep'
+alias ag='alias | grep -i'
+alias eg='env | grep -i'
+alias hg='history | grep'
 alias now='date +"%d-%m-%Y %T"'
 alias nowdate='date +"%d-%m-%Y"'
 alias nowtime='date +"%T"'
