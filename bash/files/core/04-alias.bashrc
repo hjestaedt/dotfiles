@@ -6,6 +6,7 @@ alias fal='alias | grep -i'
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
+alias -- -='cd -'
 alias d+='pushd'
 alias d-='popd'
 

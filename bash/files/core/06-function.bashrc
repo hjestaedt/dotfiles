@@ -86,3 +86,14 @@ fdecrypt() {
     openssl enc -aes-256-cbc -d -pbkdf2 -iter 10000 -in "$1" -out "${1%.enc}"
 }
 
+# description:
+#   create a directory and cd into it
+# arguments:
+#   directory - directory to create
+# usage:
+#   mkcd <directory>
+#   mkcd foobar
+mkcd() { 
+    variable_set "$1" || return_error "directory argument required"
+	mkdir -p "$1" && cd "$1"; 
+}
