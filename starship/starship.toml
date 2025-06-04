@@ -63,7 +63,6 @@ style = 'nord12'
 
 [kubernetes]
 disabled = false
-detect_files = ['k8s', 'skaffold.yaml']
 format = '$symbol [$context( \($namespace\))]($style)  '
 symbol = '⎈'
 style = 'nord8'
@@ -74,7 +73,7 @@ symbol = ''
 style = 'nord8'
 
 [python]
-format = 'via [${symbol}${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
+format = '[${symbol}${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
 detect_extensions = ['py'] 
 detect_files = ['__init__.py', 'requirements.txt', 'setup.py']
 
