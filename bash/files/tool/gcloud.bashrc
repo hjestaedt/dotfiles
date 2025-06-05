@@ -4,9 +4,10 @@
 
 if command -v gcloud >/dev/null 2>&1; then
     # gcloud aliases
-    alias gcl="gcloud"
+    alias gclcfg='gcloud config configurations'
     alias gclcfga='gcloud config configurations activate'
-    alias gclkcred='gcloud container clusters get-credentials'
+    alias gclcfgd='gcloud config configurations describe'
+    alias gclcfgl='gcloud config configurations list'
 
     # gcloud functions
     # todo: add functions

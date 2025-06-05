@@ -14,6 +14,7 @@ $git_state\
 $git_status\
 $kubernetes\
 $docker_context\
+$gcloud\
 $python\
 $jobs\
 $battery\
@@ -71,6 +72,12 @@ style = 'nord8'
 format = '$symbol [$context]($style)  '
 symbol = ''
 style = 'nord8'
+
+[gcloud]
+format = '[$symbol$project \($region\)]($style) '
+symbol = '[☁](nord4) '
+style = 'bold nord10'
+disabled = false
 
 [python]
 format = '[${symbol}${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
