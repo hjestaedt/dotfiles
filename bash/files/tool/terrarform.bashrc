@@ -13,7 +13,11 @@ if command -v kubectl >/dev/null 2>&1; then
     alias tfp="terraform plan"
     alias tfs="terraform show"
 	alias tfst="terraform state"
+	alias tfstl="terraform state list"
+	alias tfsts="terraform state show"
 	alias tfws="terraform workspace"
+	alias tfwsl="terraform workspace list"
+	alias tfwss="terraform workspace select"
 
     # terraform functions
     # todo: add functions
