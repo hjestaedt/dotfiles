@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+# kubecolor
+# - https://github.com/kubecolor/kubecolor 
+
+if command -v kubecolor >/dev/null 2>&1; then
+	alias kubectl='kubecolor'
+fi
+
 # kubectl
 # - https://kubernetes.io/docs/reference/kubectl/cheatsheet/
 
