@@ -45,15 +45,18 @@ symbol = '󰘬'
 truncation_length = 64 
 truncation_symbol = '…'
 style = 'nord8'
+disabled = false
 
 [git_commit]
 format = '[\($hash$tag\)]($style) '
 tag_disabled = false
 tag_symbol = '  '
 style = 'nord8'
+disabled = false
 
 [git_state]
 style = 'nord8'
+disabled = false
 
 [git_status]
 format = '([\[$all_status$ahead_behind\]]($style) ) '
@@ -61,6 +64,7 @@ ahead = 'a${count}'
 diverged = 'a${ahead_count}b${behind_count}'
 behind = 'b${count}'
 style = 'nord12'
+disabled = false
 
 [kubernetes]
 disabled = false
