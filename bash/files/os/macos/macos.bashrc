@@ -19,6 +19,6 @@ if [ -n /opt/homebrew/bin/brew ]; then
     for d in "$HOMEBREW_PREFIX"/opt/*/libexec/gnuman; do export MANPATH=$d:$MANPATH; done
 fi
 
-# macos specific aliases
-alias ntl='netstat -na -p TCP | grep -i "listen"'
-alias ntlp='netstat -na -p TCP | grep -i "listen"'
+# aliases not available on macos
+unalias ntl
+unalias ntlp

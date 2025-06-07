@@ -53,8 +53,6 @@ alias h='history'
 alias path='echo -e ${PATH//:/\\n}'
 alias sui='sudo -i'
 alias sul='sudo su -l'
-alias ntl='netstat -ntl'
-alias ntlp='netstat -ntlp'
 alias lsfn="declare -F | awk '{print \$NF}' | sort | egrep -v '^_'" # print all user defined functions
 
 # date & time
