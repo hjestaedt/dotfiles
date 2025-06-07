@@ -10,19 +10,16 @@ usage() {
     echo "install bash configuration locally"
     echo ""
     echo "options:"
-    echo "  -p, --profile PROFILE  profile: home, work (default: home)"
     echo "  -o, --overwrite        overwrite existing files without prompting"
     echo "  -s, --skip-backup      skip backing up existing files"
     echo "  -h, --help             show this help message and exit"
 }
 
-PROFILE="home"
 OVERWRITE=false
 SKIP_BACKUP=false
 
 while [[ $# -gt 0 ]]; do
     case $1 in
-        -p|--profile) PROFILE="$2"; shift 2 ;;
         -o|--overwrite) OVERWRITE=true; shift ;;
         -s|--skip-backup) SKIP_BACKUP=true; shift ;;
         -h|--help) usage; exit 0 ;;
@@ -58,13 +55,6 @@ if [ -d "$BASHRC_HOME" ] && [ -r "$BASHRC_HOME"/init.bashrc ]; then . "$BASHRC_H
 check_dependencies() {
     if ! command -v bash &> /dev/null; then
         echo "bash command is not available"
-        exit 1
-    fi
-}
-
-validate_profile() {
-    if [[ "$PROFILE" != "home" && "$PROFILE" != "work" ]]; then
-        echo "error: invalid profile '$PROFILE'. Valid profiles: home, work"
         exit 1
     fi
 }
@@ -118,27 +108,38 @@ install_files_from_dir() {
     done
 }
 
+install_bash_file() {
+	local bash_file="$1"
+	local src_file="$FILE_DIR/$1"
+	local dst_file="$BASHRC_HOME/$1"
+
+    if [ -f "$src_file" ]; then
+        echo "installing $bash_file to $dst_file"
+        cp "$src_file" "$dst_file"
+    else
+        echo "error: $src_file not found"
+        return 1
+    fi
+}
+
 install_bash_files() {
-    echo "installing bash configuration files for profile: $PROFILE, os: $OS"
+    echo "installing bash configuration files for os: $OS"
     
     # copy dotfile hierarchy to $BASHRC_HOME
-    for src_subdir in "core" "tool" "os/$OS" "profile/$PROFILE"; do
+    for src_subdir in "core" "tool" "user"; do
         local src_dir="$FILE_DIR/$src_subdir"
         local dst_dir="$BASHRC_HOME/$src_subdir"
         install_files_from_dir "$src_dir" "$dst_dir"
     done
 
+	# copy os/$OS.bashc to $BASHRC_HOME
+	if [ ! -d "$BASHRC_HOME/os" ]; then
+		mkdir -p "$BASHRC_HOME/os"
+	fi
+	install_bash_file "os/$OS.bashrc"
+
     # copy init.bashrc to $BASHRC_HOME
-    local init_source="$FILE_DIR/$BASHRC_INIT_FILENAME"
-    local init_target="$BASHRC_HOME/$BASHRC_INIT_FILENAME"
-    
-    if [ -f "$init_source" ]; then
-        echo "installing $BASHRC_INIT_FILENAME to $BASHRC_HOME"
-        cp "$init_source" "$init_target"
-    else
-        echo "error: $init_source not found"
-        return 1
-    fi
+	install_bash_file "$BASHRC_INIT_FILENAME"
 }
 
 initialize_bashrc() {
@@ -218,7 +219,6 @@ echo "bash"
 echo "####################"
 
 check_dependencies
-validate_profile
 
 if [ -d "$BASHRC_HOME" ]; then
     handle_existing_files
@@ -229,4 +229,4 @@ create_base_files
 install_bash_files
 initialize_bashrc
 
-echo "bash configuration installed successfully for profile: $PROFILE" 
+echo "bash configuration installed successfully" 

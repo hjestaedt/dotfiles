@@ -4,10 +4,10 @@ BASH_SILENCE_DEPRECATION_WARNING=1
 export BASH_SILENCE_DEPRECATION_WARNING
 
 # ls wrapper that hides system directories
-[ -n "$HOME"/bin/ls-filtered.sh ] && alias ls='$HOME/bin/ls-filtered.sh -F --color=auto --group-directories-first'
+[ -f "$HOME"/bin/ls-filtered.sh ] && alias ls='$HOME/bin/ls-filtered.sh -F --color=auto --group-directories-first'
 
-# homebrew
-if [ -n /opt/homebrew/bin/brew ]; then
+# homebrew 
+if command_exists /opt/homebrew/bin/brew; then # check with full path!
     eval "$(/opt/homebrew/bin/brew shellenv)"
 
     # homebrew completion
@@ -18,7 +18,3 @@ if [ -n /opt/homebrew/bin/brew ]; then
     for d in "$HOMEBREW_PREFIX"/opt/*/libexec/gnubin; do export PATH=$d:$PATH; done
     for d in "$HOMEBREW_PREFIX"/opt/*/libexec/gnuman; do export MANPATH=$d:$MANPATH; done
 fi
-
-# aliases not available on macos
-unalias ntl
-unalias ntlp

@@ -4,7 +4,7 @@
 alias init.bashrc=". \$BASHRC_HOME/init.bashrc"
 
 # initialize bashrc
-for file in "$BASHRC_HOME"/core/*.bashrc "$BASHRC_HOME"/os/**/*.bashrc "$BASHRC_HOME"/tool/*.bashrc "$BASHRC_HOME"/profile/**/*.bashrc; do
+for file in "$BASHRC_HOME"/core/*.bashrc "$BASHRC_HOME"/os/*.bashrc "$BASHRC_HOME"/tool/*.bashrc "$BASHRC_HOME"/user/*.bashrc; do
     # shellcheck disable=SC1090
     [ -f "$file" ] && . "$file"
 done
