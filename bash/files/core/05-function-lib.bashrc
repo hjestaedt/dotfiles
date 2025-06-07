@@ -1,56 +1,52 @@
 #!/usr/bin/env bash
 
 # description:
-#   check if variable is set
+#   exit with error code and optional error message
 # arguments:
-#   variable - variable to check
+#   optional: exit_code - numeric exit code (default: 1)
+#   optional: message - error message (if exit_code provided, this is $2; otherwise $1)
 # returns:
-#   0 - variable is set
-#   1 - variable is not set
+#   specified exit code or 1
 # usage:
-#   variable_set <variable>
-variable_set() {
-    [ -n "$1" ]
-}
-
-# description:
-#   check if variable is not set
-# arguments:
-#   variable - variable to check
-# returns:
-#   0 - variable is not set
-#   1 - variable is set
-# usage:
-#   variable_not_set <variable>
-variable_not_set() {
-    [ -z "$1" ]
-}
-
-# description:
-#   exit with error code (and an optional error message)
-# arguments:
-#   optional: message - error message
-# returns:
-#   1
-# usage:
-#   exit_error [message]
+#   exit_error
+#   exit_error <exit_code>
+#   exit_error <message>
+#   exit_error <exit_code> <message>
+# example:
+#   exit_error
+#   exit_error 2
+#   exit_error "file not found"
+#   exit_error 2 "invalid argument"
+# note:
+#   purely numeric messages will be interpreted as exit codes
 exit_error() {
-    variable_set "$1" && echo "error: $1" 1>&2
-    exit 1
+    local exit_code=1
+    local message=""
+    
+ 	if [ -z "$1" ]; then
+        exit "$exit_code"
+    elif [[ "$1" =~ ^[0-9]+$ ]]; then
+        exit_code="$1"
+        [ -n "$2" ] && message="$2"
+    else
+        message="$1"
+    fi
+    
+    [ -n "$message" ] && echo "error: $message" >&2
+    exit "$exit_code"
 }
 
 # description:
-#   return with error code (and an optional error message)
-#   can be used in functions, where exit would exit the whole script
+#   log error to stderr
 # arguments:
 #   optional: message - error message
 # returns:
-#   1
+#   0
 # usage:
-#   return_error [message]
-return_error() {
-    variable_set "$1" && echo "error: $1" 1>&2
-    return 1
+#   log_error message
+log_error() {
+	[ -z "$1" ] && { echo "error: message argument is required" >&2; return 1;}
+	echo "error: $1" >&2
 }
 
 # description:
@@ -62,35 +58,9 @@ return_error() {
 #   1 - command does not exist
 # usage:
 #   command_exists <command>
-#   e.g.: command_exists git
+# example:
+#   command_exists git
 command_exists() {
+    [ -z "$1" ] && { echo "error: command argument is required" >&2; return 1;}
     command -v "$1" >/dev/null 2>&1
-}
-
-# description:
-#   check if file exists
-# arguments:
-#   file - file to check
-# returns:
-#   0 - file exists
-#   1 - file does not exist
-# usage:
-#   file_exists <file>
-#   e.g.: file_exists ~/.bashrc
-file_exists() {
-    [ -f "$1" ]
-}
-
-# description:
-#   check if directory exists
-# arguments:
-#   directory - directory to check
-# returns:
-#   0 - directory exists
-#   1 - directory does not exist
-# usage:
-#   directory_exists <directory>
-#   e.g.: directory_exists ~/.config
-directory_exists() {
-    [ -d "$1" ]
 }
