@@ -4,10 +4,10 @@ BASH_SILENCE_DEPRECATION_WARNING=1
 export BASH_SILENCE_DEPRECATION_WARNING
 
 # ls wrapper that hides system directories
-file_exists "$HOME"/bin/ls.sh && alias ls='$HOME/bin/ls.sh -F --color=auto --group-directories-first'
+[ -n "$HOME"/bin/ls-filtered.sh ] && alias ls='$HOME/bin/ls-filtered.sh -F --color=auto --group-directories-first'
 
-if file_exists /opt/homebrew/bin/brew; then
-    # homebrew environment
+# homebrew
+if [ -n /opt/homebrew/bin/brew ]; then
     eval "$(/opt/homebrew/bin/brew shellenv)"
 
     # homebrew completion
@@ -21,4 +21,4 @@ fi
 
 # macos specific aliases
 alias ntl='netstat -na -p TCP | grep -i "listen"'
-alias ntlp='netstat -na -p TCP | grep -i "listen" | grep'
+alias ntlp='netstat -na -p TCP | grep -i "listen"'

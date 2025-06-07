@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 # navigation
 alias ..='cd ..'
 alias ...='cd ../..'
@@ -9,15 +8,17 @@ alias -- -='cd -'
 alias d+='pushd'
 alias d-='popd'
 
-# ls
+# file listing
 alias ls='ls --color'
-alias l='ls'
 alias ll='ls -lh'
-alias la='ls -lha'
-alias lt='ls -lhtra'
+alias la='ls -a'
+alias lla='ll -a'
+alias lt='ls -tra'
+alias llt='ll -tra'
 alias l.='ls -d .*'
+alias ll.='ll -d .*'
 
-# safety
+# safety overrides
 alias mv='mv -i'
 alias cp='cp -i'
 alias ln='ln -i'
@@ -26,35 +27,40 @@ alias chown='chown --preserve-root'
 alias chgrp='chgrp --preserve-root'
 alias chmod='chmod --preserve-root'
 
-# grep
+# grep utilities
 alias grep='grep --color=auto'
-alias igrep='grep -i'
-alias egrep='grep -E'           # extended regex
-alias fgrep='grep -F'           # fixed string
+alias gri='grep -i'
+alias gre='grep -E'           # extended regex
+alias grf='grep -F'           # fixed string
+alias agr='alias | grep'
+alias agri='alias | grep -i'
+alias egr='env | grep'
+alias egri='env | grep -i'
+alias hgr='history | grep'
+alias hgri='history | grep -i'
 
-# override default commands
+# command overrides
 alias top='htop'
 alias ping='ping -c 5'
 alias df='df -h'
 alias du='du -ch'
 alias diff='diff --color'
-
-# custom commands
 alias vi='vim'
+
+# system info & utilities
 alias cl='clear'
 alias h='history'
 alias path='echo -e ${PATH//:/\\n}'
-alias ag='alias | grep -i'
-alias eg='env | grep -i'
-alias hg='history | grep'
-alias now='date +"%d-%m-%Y %T"'
-alias nowdate='date +"%d-%m-%Y"'
-alias nowtime='date +"%T"'
 alias sui='sudo -i'
 alias sul='sudo su -l'
 alias ntl='netstat -ntl'
 alias ntlp='netstat -ntlp'
 alias lsfn="declare -F | awk '{print \$NF}' | sort | egrep -v '^_'" # print all user defined functions
+
+# date & time
+alias now='date "+%Y-%m-%d %H:%M:%S"'
+alias nowdate='date "+%Y-%m-%d"'
+alias nowtime='date "+%H:%M:%S"'
 alias datetime='date "+%Y-%m-%d %H:%M:%S"'
 alias datetime-file='date "+%Y%m%d_%H%M%S"'
 alias timestamp='date +%s'
