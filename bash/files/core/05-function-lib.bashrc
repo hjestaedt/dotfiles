@@ -80,3 +80,17 @@ command_exists() {
 file_exists() {
     [ -f "$1" ]
 }
+
+# description:
+#   check if directory exists
+# arguments:
+#   directory - directory to check
+# returns:
+#   0 - directory exists
+#   1 - directory does not exist
+# usage:
+#   directory_exists <directory>
+#   e.g.: directory_exists ~/.config
+directory_exists() {
+    [ -d "$1" ]
+}

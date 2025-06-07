@@ -97,3 +97,31 @@ mkcd() {
     variable_set "$1" || return_error "directory argument required"
 	mkdir -p "$1" && cd "$1"; 
 }
+
+# description:
+#   backup a file or directory
+# arguments:
+#   file or directory - file or directory to backup
+# usage:
+#   backup <file|directory>
+#   backup foobar
+backup() {
+    variable_set "$1" || return_error "file or directory argument required"
+    cp -r "$1" "$1.bak.$(date +%Y%m%d_%H%M%S)"
+}
+
+# description:
+#   backup a file or directory to BACKUP_DIR
+# arguments:
+#   file or directory - file or directory to backup
+# usage:
+#   backup_to_dir <file|directory>
+#   backup_to_dir foobar
+backup_to_dir() {
+    variable_not_set "$1" && return_error "file or directory argument required"
+    variable_not_set "$BACKUP_DIR" && return_error "BACKUP_DIR environment variable not set"
+    directory_exists "$BACKUP_DIR" || mkdir -p "$BACKUP_DIR"
+    
+    local basename=$(basename "$1")
+    cp -r "$1" "$BACKUP_DIR/${basename}.bak.$(date +%Y%m%d_%H%M%S)"
+}
