@@ -1,17 +1,16 @@
 #!/usr/bin/env bash
 
-# github cli (gh)
-# https://cli.github.com/manual/gh
 
 if command -v gh >/dev/null 2>&1; then
+    
     # github cli aliases
 
-    alias ghrl='gh repo list'
-    alias ghrv='gh repo view'
-    alias ghrc='gh repo clone'
-
-    alias ghprl='gh pr list'
-    alias ghprv='gh pr view'
+    alias ghprdf='gh pr diff'
+    alias ghprls='gh pr list'
+    alias ghprvw='gh pr view'
+    alias ghrpcl='gh repo clone'
+    alias ghrpls='gh repo list'
+    alias ghrpvw='gh repo view'
 
     # github cli functions
     # todo: add functions

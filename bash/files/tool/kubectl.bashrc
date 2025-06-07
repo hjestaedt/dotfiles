@@ -1,14 +1,8 @@
 #!/usr/bin/env bash
 
-# kubecolor
-# - https://github.com/kubecolor/kubecolor 
-
 if command -v kubecolor >/dev/null 2>&1; then
 	alias kubectl='kubecolor'
 fi
-
-# kubectl
-# - https://kubernetes.io/docs/reference/kubectl/cheatsheet/
 
 if command -v kubectl >/dev/null 2>&1; then
 
@@ -18,91 +12,91 @@ if command -v kubectl >/dev/null 2>&1; then
 
     # kubectl aliases
 
-    alias k='kubectl'
-    alias ka='kubectl apply'
-    alias kaf='kubectl apply -f'
-    alias kak='kubectl apply -k'
-    alias kk='kubectl kustomize'
-    alias kc='kubectl create'
-    alias kg='kubectl get'
-    alias kl='kubectl logs'
-    alias klf='kubectl logs -f'
-    alias kdl='kubectl delete'
-    alias kdlf='kubectl delete -f'
-    alias kdlk='kubectl delete -k'
-    alias kds='kubectl describe'
-    alias kex='kubectl exec'
-    alias kexit='kubectl exec -it'
-    alias kpf='kubectl port-forward'
-    alias kcfg='kubectl config'
+    alias kbc='kubectl'
+    alias kbcap='kubectl apply'
+    alias kbcapf='kubectl apply -f'
+    alias kbcapk='kubectl apply -k'
+    alias kbccfg='kubectl config'
+    alias kbccr='kubectl create'
+    alias kbcdl='kubectl delete'
+    alias kbcdlf='kubectl delete -f'
+    alias kbcdlk='kubectl delete -k'
+    alias kbcds='kubectl describe'
+    alias kbcex='kubectl exec'
+    alias kbcexit='kubectl exec -it'
+    alias kbcgt='kubectl get'
+    alias kbckz='kubectl kustomize'
+    alias kbclg='kubectl logs'
+    alias kbclgf='kubectl logs -f'
+    alias kbcpf='kubectl port-forward'
 
-    alias kge='kubectl get events --sort-by=.metadata.creationTimestamp'
-    alias kgew='kubectl get events --sort-by=.metadata.creationTimestamp --watch'
+    alias kbcdla='kubectl delete all --all'
+    alias kbcgta='kubectl get all'
+    alias kbcgtar='kubectl get all,cm,secret,ing'
 
-    alias kga='kubectl get all'
-    alias kgar='kubectl get all,cm,secret,ing'
-    alias kdla='kubectl delete all --all'
+    alias kbcgtevt='kubectl get events --sort-by=.metadata.creationTimestamp'
+    alias kbcgtevtw='kubectl get events --sort-by=.metadata.creationTimestamp --watch'
 
-    alias kgp='kubectl get pod'
-    alias kdsp='kubectl describe pod'
-    alias kdlp='kubectl delete pod'
-    alias ktpp='kubectl top pod'
-    alias wkgp='watch -n 1 kubectl get pod'
+    alias kbcgtpo='kubectl get pod'
+    alias kbcdspo='kubectl describe pod'
+    alias kbcdlpo='kubectl delete pod'
+    alias kbctoppo='kubectl top pod'
+    alias wkbcgtpo='watch -n 1 kubectl get pod'
 
-    alias kgd='kubectl get deployment'
-    alias kdsd='kubectl describe deployment'
-    alias kdld='kubectl delete deployment'
+    alias kbcgtdp='kubectl get deployment'
+    alias kbcdsdp='kubectl describe deployment'
+    alias kbcdldp='kubectl delete deployment'
 
-    alias kgsts='kubectl get statefulset'
-    alias kdssts='kubectl describe statefulset'
-    alias kdlsts='kubectl delete statefulset'
+    alias kbcgtsts='kubectl get statefulset'
+    alias kbcdssts='kubectl describe statefulset'
+    alias kbcdlsts='kubectl delete statefulset'
 
-    alias kgsvc='kubectl get service'
-    alias kdssvc='kubectl describe service'
-    alias kdlsvc='kubectl delete service'
+    alias kbcgtsvc='kubectl get service'
+    alias kbcdssvc='kubectl describe service'
+    alias kbcdlsvc='kubectl delete service'
 
-    alias kging='kubectl get ingress'
-    alias kdsing='kubectl describe ingress'
-    alias kdling='kubectl delete ingress'
+    alias kbcgting='kubectl get ingress'
+    alias kbcdsing='kubectl describe ingress'
+    alias kbcdling='kubectl delete ingress'
 
-    alias kgsec='kubectl get secret'
-    alias kdssec='kubectl describe secret'
-    alias kdlsec='kubectl delete secret'
+    alias kbcgtsc='kubectl get secret'
+    alias kbcdssc='kubectl describe secret'
+    alias kbcdlsc='kubectl delete secret'
 
-    alias kgexsec='kubectl get externalsecret'
-    alias kdsexsec='kubectl describe externalsecret'
-    alias kdlexsec='kubectl delete externalsecret'
+    alias kbcgtexsc='kubectl get externalsecret'
+    alias kbcdsexsc='kubectl describe externalsecret'
+    alias kbcdlexsc='kubectl delete externalsecret'
 
-    alias kgcm='kubectl get configmap'
-    alias kdscm='kubectl describe configmap'
-    alias kdlcm='kubectl delete configmap'
+    alias kbcgtcm='kubectl get configmap'
+    alias kbcdscm='kubectl describe configmap'
+    alias kbcdlcm='kubectl delete configmap'
 
-    alias kgpvc='kubectl get pvc'
-    alias kdspvc='kubectl describe pvc'
-    alias kdlpvc='kubectl delete pvc'
+    alias kbcgtpvc='kubectl get pvc'
+    alias kbcdspvc='kubectl describe pvc'
+    alias kbcdlpvc='kubectl delete pvc'
 
-    alias kgns='kubectl get namespace'
-    alias kcns='kubectl create namespace'
-    alias kdsns='kubectl describe namespace'
-    alias kdlns='kubectl delete namespace'
+    alias kbcgtns='kubectl get namespace'
+    alias kbccrns='kubectl create namespace'
+    alias kbcdsns='kubectl describe namespace'
+    alias kbcdlns='kubectl delete namespace'
 
-    alias kgn='kubectl get node'
-    alias kdsn='kubectl describe node'
-    alias kdln='kubectl delete node'
-    alias ktpn='kubectl top node'
+    alias kbcgtno='kubectl get node'
+    alias kbcdsno='kubectl describe node'
+    alias kbcdlno='kubectl delete node'
+    alias kbctopno='kubectl top node'
 
-    alias kgctx='kubectl config current-context'
-    alias kgctxs='kubectl config get-contexts'
-    alias ksctx='kubectl config use-context'
+    alias kbcgtctx='kubectl config current-context'
+    alias kbcgtctxs='kubectl config get-contexts'
+    alias kbcsctx='kubectl config use-context'
 
-    alias kgdns="kubectl config view --minify --output 'jsonpath={..namespace}'"
-    alias ksdns='kubectl config set-context --current --namespace'
-    alias kdxdns='kubectl config set-context --current --namespace default'
+    alias kbcgtdns="kubectl config view --minify --output 'jsonpath={..namespace}'"
+    alias kbcsdns='kubectl config set-context --current --namespace'
+    alias kbcdxdns='kubectl config set-context --current --namespace default'
 
-    alias krrd="kubectl rollout restart deployment"
+    alias kbcrrr="kubectl rollout restart deployment"
 
-    alias kgpf="ps -ef | grep 'kubectl' | grep 'port-forward' | awk '{print \$(NF-1), \$NF}'"
-    alias kdxpfa='pgrep -fi "kubectl.*port-forward" | xargs kill -9'
+    alias kbcgtpf="ps -ef | grep 'kubectl' | grep 'port-forward' | awk '{print \$(NF-1), \$NF}'"
+    alias kbcdxpfa='pgrep -fi "kubectl.*port-forward" | xargs kill -9'
 
     # kubectl functions
 
