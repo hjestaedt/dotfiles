@@ -61,6 +61,7 @@ if command -v git >/dev/null 2>&1; then
     alias grsthd='git reset --hard'
     alias grstmx='git reset --mixed'
     alias grstsf='git reset --soft'
+    alias gs='git status -sb'
     alias gst='git status'
     alias gsth='git stash'
     alias gstha='git stash apply'
