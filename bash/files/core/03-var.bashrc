@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# locale
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
 # editor
 EDITOR=vim
 VISUAL=vim
