@@ -2,7 +2,10 @@
 syntax on
 
 " enable file type detection and plugins
-filetype plugin indent on
+filetype plugin  indent on
+
+" toggle paste mode key
+set pastetoggle=<F1>
 
 " fix broken backspace
 set backspace=indent,eol,start
