@@ -62,3 +62,9 @@ alias nowtime='date "+%H:%M:%S"'
 alias datetime='date "+%Y-%m-%d %H:%M:%S"'
 alias datetime-file='date "+%Y%m%d_%H%M%S"'
 alias timestamp='date +%s'
+
+# fzf
+if command -v fzf >/dev/null 2>&1; then
+	alias afz='alias | sed "s/alias //" | fzf --preview "echo {}" --preview-window=down:1' # | cut -d"=" -f1'
+	alias efz='env | fzf --preview "echo {}" --preview-window=down:1' # | cut -d"=" -f1'
+fi
