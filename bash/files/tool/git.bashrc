@@ -61,7 +61,14 @@ if command_exists git; then
         alias gshds='git show --oneline | delta -s'
     fi
 
-    #
+    # git restore
+    # https://git-scm.com/docs/git-restore
+    alias gres='git restore'
+    alias gres.='git restore .'
+	alias gresa='git restore :/'
+    alias gress='git restore --staged'
+    alias gress.='git restore --staged .'
+    alias gressa='git restore --staged :/'
 
     # git switch
     # https://git-scm.com/docs/git-switch
@@ -101,10 +108,6 @@ if command_exists git; then
     alias grema='git remote add'
     alias gremr='git remote rm'
     alias gremv='git remote -v'
-    alias gres='git restore'
-    alias gres.='git restore .'
-    alias gress='git restore --staged'
-    alias gress.='git restore --staged .'
     alias grfl='git reflog'
     alias grm='git rm'
     alias grmc='git rm --cached'
