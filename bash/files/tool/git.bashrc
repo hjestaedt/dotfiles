@@ -4,10 +4,56 @@ if command -v git >/dev/null 2>&1; then
 
     # git aliases
 
+	# git 
+	# https://git-scm.com/docs/git
     alias g='git'
+	
+	# git status
+	# https://git-scm.com/docs/git-status
+    alias gst='git status --show-stash'
+    alias gsts='git status -sb'
+
+	# git add
+	# https://git-scm.com/docs/git-add
     alias gad='git add'
     alias gad.='git add .'
     alias gada='git add --all'
+
+	# git commit
+	# https://git-scm.com/docs/git-commit
+    alias gcm='git commit'
+    alias gcmm='git commit -m'
+    alias gcma='git commit -a'
+	alias gcmo='git commit -o'
+    alias gcmam='git commit -am'
+	alias gcmom='git commit -om'
+    alias gcmamn='git commit --amend'
+	
+	# git log
+	# https://git-scm.com/docs/git-log
+    alias glg='git log'
+	alias glgo='git log --oneline'
+	alias glga='git log --all'
+	alias glgg='git log --graph'
+    alias glgs='git log --stat'
+    alias glgoa='git log --oneline --all'
+    alias glgog='git log --oneline --graph'
+	alias glgos='git log --oneline --stat'
+
+	# git show
+	# https://git-scm.com/docs/git-show
+	alias gsh='git show'
+	alias gsho='git show --oneline'
+
+	# git show piped to delta
+	# https://github.com/dandavison/delta
+	if command -v delta >/dev/null 2>&1; then
+		alias gshd='git show --oneline | delta'
+		alias gshds='git show --oneline | delta -s'
+	fi
+
+	# 
+
     alias gbr='git branch'
     alias gbra='git branch -a'
     alias gbrd='git branch -d'
@@ -18,11 +64,6 @@ if command -v git >/dev/null 2>&1; then
     alias gcfgg='git config --global'
     alias gcfgl='git config --local'
     alias gcl='git clone'
-    alias gcm='git commit'
-    alias gcma='git commit -a'
-    alias gcmam='git commit -am'
-    alias gcmamn='git commit --amend'
-    alias gcmm='git commit -m'
     alias gco='git checkout'
     alias gcob='git checkout -b'
     alias gdf='git diff'
@@ -32,11 +73,6 @@ if command -v git >/dev/null 2>&1; then
     alias gft='git fetch'
     alias gftp='git fetch --prune'
     alias gini='git init'
-    alias glg='git log'
-    alias glgg='git log --graph --oneline --decorate --all'
-    alias glgo='git log --oneline --decorate -n 10'
-    alias glgoa='git log --oneline --decorate --all'
-    alias glgs='git log --stat'
     alias gmg='git merge'
     alias gmv='git mv'
     alias gno='git notes'
@@ -61,8 +97,6 @@ if command -v git >/dev/null 2>&1; then
     alias grsthd='git reset --hard'
     alias grstmx='git reset --mixed'
     alias grstsf='git reset --soft'
-    alias gs='git status -sb'
-    alias gst='git status'
     alias gsth='git stash'
     alias gstha='git stash apply'
     alias gsthc='git stash clear'
@@ -70,6 +104,7 @@ if command -v git >/dev/null 2>&1; then
     alias gsthl='git stash list'
     alias gsthp='git stash pop'
     alias gsw='git switch'
+    alias gswc='git switch -c'
     alias gsw-='git switch -'
 
     # git functions
