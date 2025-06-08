@@ -8,3 +8,8 @@ export BACKUP_DIR
 if command_exists fzf; then
 	eval "$(fzf --bash)"
 fi
+
+# thefuck
+if command_exists thefuck; then
+	eval "$(thefuck --alias)"
+fi

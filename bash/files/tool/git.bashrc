@@ -39,18 +39,21 @@ if command_exists git; then
     alias gcmo='git commit -o'
     alias gcmam='git commit -am'    
     alias gcmom='git commit -om'
+	alias gcmne='git commit --no-edit'
     alias gcmamn='git commit --amend'
+    alias gcmamnne='git commit --amend --no-edit'
 
     # git log
     # https://git-scm.com/docs/git-log
-    alias glg='git log'
-    alias glgo='git log --oneline'
-    alias glga='git log --all'
-    alias glgg='git log --graph'
-    alias glgs='git log --stat'
-    alias glgoa='git log --oneline --all'
-    alias glgog='git log --oneline --graph'
-    alias glgos='git log --oneline --stat'
+    alias glg='git log --oneline'
+    alias glga='git log --oneline --all'
+    alias glgg='git log --oneline --graph'
+    alias glgs='git log --oneline --stat'
+
+    alias glgf='git log --oneline'
+    alias glgfa='git log --all'
+    alias glgfg='git log --graph'
+    alias glgfs='git log --stat'
 
     # git show
     # https://git-scm.com/docs/git-show
@@ -69,6 +72,22 @@ if command_exists git; then
     alias gress='git restore --staged'
     alias gress.='git restore --staged .'
     alias gressa='git restore --staged :/'
+	
+    # git reset
+    # https://git-scm.com/docs/git-reset
+    alias grst='git reset'
+    alias grstsf='git reset --soft'
+    alias grstmx='git reset --mixed'
+    alias grsthd='git reset --hard'
+
+	# git branch
+	# https://git-scm.com/docs/git-branch
+    alias gbr='git branch'
+    alias gbra='git branch -a'
+    alias gbrd='git branch -d'
+    alias gbrdf='git branch -d -f'
+    alias gbrm='git branch -m'
+    alias gbrr='git branch -r'
 
     # git switch
     # https://git-scm.com/docs/git-switch
@@ -76,12 +95,19 @@ if command_exists git; then
     alias gswc='git switch -c'
     alias gsw-='git switch -'
 
-    alias gbr='git branch'
-    alias gbra='git branch -a'
-    alias gbrd='git branch -d'
-    alias gbrD='git branch -D'
-    alias gbrm='git branch -m'
-    alias gbrr='git branch --remote'
+    # git merge 
+    # https://git-scm.com/docs/git-merge
+    alias gmg='git merge'
+	alias gmgff='git merge --ff'
+	alias gmgnff='git merge --no-ff'
+	alias gmgnc='git merge --no-commit'
+	alias gmgsq='git merge --squash'
+	alias gmgsqne='git merge --squash && git commit --no-edit'
+	alias gmgab='git merge --abort'
+	
+
+    alias grm='git rm'
+    alias grmc='git rm --cached'
     alias gcfg='git config'
     alias gcfgg='git config --global'
     alias gcfgl='git config --local'
@@ -95,7 +121,6 @@ if command_exists git; then
     alias gft='git fetch'
     alias gftp='git fetch --prune'
     alias gini='git init'
-    alias gmg='git merge'
     alias gmv='git mv'
     alias gno='git notes'
     alias gpl='git pull'
@@ -109,18 +134,15 @@ if command_exists git; then
     alias gremr='git remote rm'
     alias gremv='git remote -v'
     alias grfl='git reflog'
-    alias grm='git rm'
-    alias grmc='git rm --cached'
-    alias grst='git reset'
-    alias grsthd='git reset --hard'
-    alias grstmx='git reset --mixed'
-    alias grstsf='git reset --soft'
-    alias gsth='git stash'
-    alias gstha='git stash apply'
-    alias gsthc='git stash clear'
-    alias gsthd='git stash drop'
-    alias gsthl='git stash list'
-    alias gsthp='git stash pop'
+
+	# git stash
+    # https://git-scm.com/docs/git-stash
+	alias gsth='git stash'
+    alias gsthap='git stash apply'
+    alias gsthclr='git stash clear'
+    alias gsthdrp='git stash drop'
+    alias gsthls='git stash list'
+    alias gsthpp='git stash pop'
 
     # git functions
 
@@ -145,45 +167,58 @@ if command_exists git; then
 
     if ((FZF)); then
 
-        # gswfz - switch to a git branch using fzf
-        # description:
-        #   interactively switch to a git branch using fzf
-        #   shows local/remote branch types
-        # arguments:
-        #   none - uses fzf for interactive selection
-        # usage:
-        #   gswfz
-        # note:
-        #   automatically creates local tracking branches for remote branches
-        gswfz() {
-            local current_branch
-            current_branch=$(git branch --show-current)
+    # gswfz - switch to a git branch using fzf
+    # description:
+    #   interactively switch to a git branch using fzf
+    #   shows local branches and remote branches without local counterparts
+    # arguments:
+    #   none - uses fzf for interactive selection
+    # usage:
+    #   gswfz
+    # note:
+    #   automatically creates local tracking branches for remote branches
+    gswfz() {
+        local current_branch
+        current_branch=$(git branch --show-current)
 
-            local available_branches
-            available_branches=$(
-                git branch -a | grep -v HEAD | sed 's/^[* ] *//' |
-                    awk -v current="$current_branch" '{
-                        if(/^remotes\//) {
-                            name = substr($0, match($0, /\/[^\/]+$/)+1)
-                            prefix = "[remote] "
-                        } else {
-                            name = $0
-                            prefix = "[local] "
-                        }
-                        if(name == current) prefix = "[current] "
-                        print prefix name
-                    }'
-            )
+        local local_branches
+        local_branches=$(git branch --format='%(refname:short)')
 
-            local selected_branch
-            selected_branch=$(echo "$available_branches" | fzf)
-
-            if [ -n "$selected_branch" ]; then
-                if [ "$selected_branch" != "$current_branch" ]; then
-                    git switch "$selected_branch"
+        local available_branches
+        available_branches=$(
+            {
+                # show current branch last
+                if [ -n "$current_branch" ]; then
+                    echo "[current] $current_branch"
                 fi
+
+                # show local branches (excluding current)
+                echo "$local_branches" | awk -v current="$current_branch" '{
+                    if($0 != current) {
+                        print "[local] " $0
+                    }
+                }'
+                
+                # show remote branches that don't have local counterparts
+                comm -23 \
+                    <(git branch -r | grep -v HEAD | sed 's/^[* ] *//' | sed 's/^[^\/]*\///' | sort) \
+                    <(echo "$local_branches" | sort) | \
+                awk '{print "[remote] " $0}'
+            }
+        )
+
+        local selected_branch
+        selected_branch=$(echo "$available_branches" | fzf)
+
+        if [ -n "$selected_branch" ]; then
+            local branch_name
+            branch_name=${selected_branch#\[*\] }
+                        
+            if [ "$branch_name" != "$current_branch" ]; then
+                git switch "$branch_name"
             fi
-        }
+        fi
+    }
 
     fi
 
