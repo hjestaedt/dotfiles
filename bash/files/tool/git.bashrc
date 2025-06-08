@@ -1,58 +1,73 @@
 #!/usr/bin/env bash
 
-if command -v git >/dev/null 2>&1; then
+if command_exists git; then
+
+    # fzf
+    # https://github.com/junegunn/fzf
+    if command_exists fzf; then
+        FZF=1
+    fi
+
+    # delta
+    # https://github.com/dandavison/delta
+    if command_exists delta; then
+        DELTA=1
+    fi
 
     # git aliases
 
-	# git 
-	# https://git-scm.com/docs/git
+    # git
+    # https://git-scm.com/docs/git
     alias g='git'
-	
-	# git status
-	# https://git-scm.com/docs/git-status
+
+    # git status
+    # https://git-scm.com/docs/git-status
     alias gst='git status --show-stash'
     alias gsts='git status -sb'
 
-	# git add
-	# https://git-scm.com/docs/git-add
+    # git add
+    # https://git-scm.com/docs/git-add
     alias gad='git add'
     alias gad.='git add .'
     alias gada='git add --all'
 
-	# git commit
-	# https://git-scm.com/docs/git-commit
+    # git commit
+    # https://git-scm.com/docs/git-commit
     alias gcm='git commit'
     alias gcmm='git commit -m'
     alias gcma='git commit -a'
-	alias gcmo='git commit -o'
-    alias gcmam='git commit -am'
-	alias gcmom='git commit -om'
+    alias gcmo='git commit -o'
+    alias gcmam='git commit -am'    
+    alias gcmom='git commit -om'
     alias gcmamn='git commit --amend'
-	
-	# git log
-	# https://git-scm.com/docs/git-log
+
+    # git log
+    # https://git-scm.com/docs/git-log
     alias glg='git log'
-	alias glgo='git log --oneline'
-	alias glga='git log --all'
-	alias glgg='git log --graph'
+    alias glgo='git log --oneline'
+    alias glga='git log --all'
+    alias glgg='git log --graph'
     alias glgs='git log --stat'
     alias glgoa='git log --oneline --all'
     alias glgog='git log --oneline --graph'
-	alias glgos='git log --oneline --stat'
+    alias glgos='git log --oneline --stat'
 
-	# git show
-	# https://git-scm.com/docs/git-show
-	alias gsh='git show'
-	alias gsho='git show --oneline'
+    # git show
+    # https://git-scm.com/docs/git-show
+    alias gsh='git show'
+    alias gsho='git show --oneline'
+    if ((DELTA)); then
+        alias gshd='git show --oneline | delta'
+        alias gshds='git show --oneline | delta -s'
+    fi
 
-	# git show piped to delta
-	# https://github.com/dandavison/delta
-	if command -v delta >/dev/null 2>&1; then
-		alias gshd='git show --oneline | delta'
-		alias gshds='git show --oneline | delta -s'
-	fi
+    #
 
-	# 
+    # git switch
+    # https://git-scm.com/docs/git-switch
+    alias gsw='git switch'
+    alias gswc='git switch -c'
+    alias gsw-='git switch -'
 
     alias gbr='git branch'
     alias gbra='git branch -a'
@@ -103,12 +118,10 @@ if command -v git >/dev/null 2>&1; then
     alias gsthd='git stash drop'
     alias gsthl='git stash list'
     alias gsthp='git stash pop'
-    alias gsw='git switch'
-    alias gswc='git switch -c'
-    alias gsw-='git switch -'
 
     # git functions
 
+    # grbbr - rebase current branch onto another branch after updating it
     # description:
     #   rebase current branch onto another branch after updating it
     # arguments:
@@ -117,10 +130,58 @@ if command -v git >/dev/null 2>&1; then
     #   grbbr <branch_name>
     #   e.g.: grbbr main, grbbr develop
     grbbr() {
-        [ -n "$1" ] || { echo "branch name argument required" >&2; return 1; }
-        git switch "$1" && \
-        git pull --rebase && \
-        git switch - && \
-        git rebase "$1"
+        [ -n "$1" ] || {
+            echo "branch name argument required" >&2
+            return 1
+        }
+        git switch "$1" &&
+            git pull --rebase &&
+            git switch - &&
+            git rebase "$1"
     }
+
+    if ((FZF)); then
+
+        # gswfz - switch to a git branch using fzf
+        # description:
+        #   interactively switch to a git branch using fzf
+        #   shows local/remote branch types
+        # arguments:
+        #   none - uses fzf for interactive selection
+        # usage:
+        #   gswfz
+        # note:
+        #   automatically creates local tracking branches for remote branches
+        gswfz() {
+            local current_branch
+            current_branch=$(git branch --show-current)
+
+            local available_branches
+            available_branches=$(
+                git branch -a | grep -v HEAD | sed 's/^[* ] *//' |
+                    awk -v current="$current_branch" '{
+                        if(/^remotes\//) {
+                            name = substr($0, match($0, /\/[^\/]+$/)+1)
+                            prefix = "[remote] "
+                        } else {
+                            name = $0
+                            prefix = "[local] "
+                        }
+                        if(name == current) prefix = "[current] "
+                        print prefix name
+                    }'
+            )
+
+            local selected_branch
+            selected_branch=$(echo "$available_branches" | fzf)
+
+            if [ -n "$selected_branch" ]; then
+                if [ "$selected_branch" != "$current_branch" ]; then
+                    git switch "$selected_branch"
+                fi
+            fi
+        }
+
+    fi
+
 fi
