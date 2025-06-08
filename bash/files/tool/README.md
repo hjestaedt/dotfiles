@@ -53,6 +53,7 @@
 | doctor | `doc` |
 | down | `dn` |
 | drain | `drn` |
+| drop | `drp` |
 | edit | `ed` |
 | exec | `ex` |
 | export | `exp` |
@@ -89,6 +90,7 @@
 | patch | `pt` |
 | plan | `pn` |
 | port-forward | `pf` |
+| pop | `pp` |
 | processes | `ps` |
 | prune | `prn` |
 | pull | `pl` |
