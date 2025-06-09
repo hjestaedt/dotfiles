@@ -32,17 +32,6 @@ done
 BASHRC_FILE="$HOME/.bashrc"
 BASHRC_HOME="$HOME/.bashrc.d"
 
-# detect operating system
-os_name=$(uname -s)
-if [ "$os_name" = "Linux" ]; then
-    OS="linux"
-elif [ "$os_name" = "Darwin" ]; then
-    OS="macos"
-else
-    echo "error: unsupported os: $os_name" >&2
-    exit 1
-fi
-
 FILE_DIR="$SCRIPT_DIR/files"
 BASHRC_INIT_FILENAME="init.bashrc"
 
@@ -123,7 +112,7 @@ install_bash_file() {
 }
 
 install_bash_files() {
-    echo "installing bash configuration files for os: $OS"
+    echo "installing bash configuration files"
     
     # copy dotfile hierarchy to $BASHRC_HOME
     for src_subdir in "core" "tool" "user"; do
@@ -131,12 +120,6 @@ install_bash_files() {
         local dst_dir="$BASHRC_HOME/$src_subdir"
         install_files_from_dir "$src_dir" "$dst_dir"
     done
-
-	# copy os/$OS.bashc to $BASHRC_HOME
-	if [ ! -d "$BASHRC_HOME/os" ]; then
-		mkdir -p "$BASHRC_HOME/os"
-	fi
-	install_bash_file "os/$OS.bashrc"
 
     # copy init.bashrc to $BASHRC_HOME
 	install_bash_file "$BASHRC_INIT_FILENAME"

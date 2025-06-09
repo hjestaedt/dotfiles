@@ -64,3 +64,52 @@ command_exists() {
     [ -z "$1" ] && { echo "error: command argument is required" >&2; return 1;}
     command -v "$1" >/dev/null 2>&1
 }
+
+
+# description:
+#   check if running on Linux
+# arguments:
+#   none
+# returns:
+#   0 if Linux, 1 otherwise
+# usage:
+#   if is_linux; then
+#       echo "Running on Linux"
+#   fi
+is_linux() {
+    [ "$(uname -s)" = "Linux" ]
+}
+
+# description:
+#   check if running on macOS
+# arguments:
+#   none
+# returns:
+#   0 if macOS, 1 otherwise
+# usage:
+#   if is_macos; then
+#       echo "Running on macOS"
+#   fi
+is_macos() {
+    [ "$(uname -s)" = "Darwin" ]
+}
+
+# description:
+#   get normalized OS type string
+# arguments:
+#   none
+# returns:
+#   0 on success, 1 on unsupported OS
+# usage:
+#   os_type=$(get_os_type)
+#   echo "OS: $os_type"  # will be "linux" or "macos"
+get_os_type() {
+    if is_linux; then
+        echo "linux"
+    elif is_macos; then
+        echo "macos"
+    else
+        echo "error: unsupported os: $(uname -s)" >&2
+        return 1
+    fi
+}

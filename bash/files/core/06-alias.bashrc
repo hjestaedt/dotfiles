@@ -9,7 +9,11 @@ alias d+='pushd'
 alias d-='popd'
 
 # file listing
-alias ls='ls --color'
+if [ is_macos ]; then
+	alias ls='$MACOS_LS'
+else
+	alias ls='ls --color'
+fi
 alias ll='ls -lh'
 alias la='ls -a'
 alias lla='ll -a'
