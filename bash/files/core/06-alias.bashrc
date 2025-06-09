@@ -42,6 +42,8 @@ alias egr='env | grep'
 alias egri='env | grep -i'
 alias hgr='history | grep'
 alias hgri='history | grep -i'
+alias fngr='fnls | grep' 
+alias fngri='fnls | grep -i' 
 
 # command overrides
 alias top='htop'
@@ -57,18 +59,21 @@ alias h='history'
 alias path='echo -e ${PATH//:/\\n}'
 alias sui='sudo -i'
 alias sul='sudo su -l'
-alias lsfn="declare -F | awk '{print \$NF}' | sort | egrep -v '^_'" # print all user defined functions
+alias fnls="declare -F | awk '{print \$NF}' | sort | grep -v -E '^_'" # print all user defined functions
+alias fnsh='type'
 
 # date & time
 alias now='date "+%Y-%m-%d %H:%M:%S"'
 alias nowdate='date "+%Y-%m-%d"'
 alias nowtime='date "+%H:%M:%S"'
 alias datetime='date "+%Y-%m-%d %H:%M:%S"'
-alias datetime-file='date "+%Y%m%d_%H%M%S"'
+alias datetime_file='date "+%Y%m%d_%H%M%S"'
 alias timestamp='date +%s'
 
 # fzf
 if command -v fzf >/dev/null 2>&1; then
 	alias afz='alias | sed "s/alias //" | fzf --preview "echo {}" --preview-window=down:1' # | cut -d"=" -f1'
 	alias efz='env | fzf --preview "echo {}" --preview-window=down:1' # | cut -d"=" -f1'
+	alias fnez='fnls | fzf --preview "echo {}" --preview-window=down:1'
+	alias fnshez='type $(fnez)'
 fi
