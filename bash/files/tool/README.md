@@ -42,6 +42,7 @@
 | clone | `cl` |
 | commit | `cm` |
 | config/configure | `cfg` |
+| connect | `cn` |
 | container | `ctr` |
 | copy | `cp` |
 | create | `cr` |
