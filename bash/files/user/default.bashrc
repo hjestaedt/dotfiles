@@ -12,6 +12,10 @@ export BACKUP_DIR
 # tools
 #
 
+if command_exists terraform; then
+	complete -C $(command -v terraform) terraform tf
+fi
+
 if command_exists fzf; then
 	eval "$(fzf --bash)"
 fi
