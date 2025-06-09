@@ -89,7 +89,7 @@
 | output | `out` |
 | package | `pkg` |
 | patch | `pt` |
-| plan | `pn` |
+| plan | `pln` |
 | port-forward | `pf` |
 | pop | `pp` |
 | processes | `ps` |
