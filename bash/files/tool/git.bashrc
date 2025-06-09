@@ -105,8 +105,28 @@ if command_exists git; then
 	alias gmgsqne='git merge --squash && git commit --no-edit'
 	alias gmgab='git merge --abort'
 	
+	#
 
-    alias grm='git rm'
+	# git remote
+    # https://git-scm.com/docs/git-remote
+	alias grem='git remote'
+    alias gremv='git remote -v'
+    alias gremad='git remote add'
+    alias gremrm='git remote rm'
+
+	# git stash
+    # https://git-scm.com/docs/git-stash
+	alias gsth='git stash'
+    alias gsthap='git stash apply'
+    alias gsthclr='git stash clear'
+    alias gsthdrp='git stash drop'
+    alias gsthls='git stash list'
+    alias gsthpp='git stash pop'
+
+	#
+
+    # TODO update
+	alias grm='git rm'
     alias grmc='git rm --cached'
     alias gcfg='git config'
     alias gcfgg='git config --global'
@@ -130,19 +150,7 @@ if command_exists git; then
     alias grb='git rebase'
     alias grba='git rebase --abort'
     alias grbi='git rebase -i'
-    alias grema='git remote add'
-    alias gremr='git remote rm'
-    alias gremv='git remote -v'
     alias grfl='git reflog'
-
-	# git stash
-    # https://git-scm.com/docs/git-stash
-	alias gsth='git stash'
-    alias gsthap='git stash apply'
-    alias gsthclr='git stash clear'
-    alias gsthdrp='git stash drop'
-    alias gsthls='git stash list'
-    alias gsthpp='git stash pop'
 
     # git functions
 
