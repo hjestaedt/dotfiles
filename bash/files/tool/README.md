@@ -20,7 +20,7 @@
 | prometheus | `prm` |
 | skaffold | `skf` |
 | starship | `ssp` |
-| terraform | `trf` |
+| terraform | `tf` |
 
 ## Action Suffixes
 
