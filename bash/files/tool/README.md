@@ -15,7 +15,7 @@
 | helm | `hlm` |
 | homebrew | `hbr` |
 | istio | `ist` |
-| kubectl | `kbc` |
+| kubectl | `kb` |
 | podman | `pdm` |
 | prometheus | `prm` |
 | skaffold | `skf` |
