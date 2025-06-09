@@ -166,12 +166,47 @@ initialize_bashrc() {
     
     # add initialization block (only if we're going to modify)
     if [[ "$needs_update" == true ]]; then
-        {
-            echo
-            echo "$start_marker"
-            echo "$BASHRC_INIT_BLOCK"
-            echo "$end_marker"
-        } >> "$BASHRC_FILE"
+        # create temporary file
+        local temp_file
+        temp_file=$(mktemp)
+        
+        if [ -f "$BASHRC_FILE" ] && [ -s "$BASHRC_FILE" ]; then
+            # read existing .bashrc content
+            local first_line
+            first_line=$(head -n1 "$BASHRC_FILE")
+            
+            if [[ "$first_line" =~ ^#! ]]; then
+                # file starts with shebang, insert after it
+                echo "$first_line" > "$temp_file"
+                echo "" >> "$temp_file"
+                echo "$start_marker" >> "$temp_file"
+                echo "$BASHRC_INIT_BLOCK" >> "$temp_file"
+                echo "$end_marker" >> "$temp_file"
+                tail -n +2 "$BASHRC_FILE" >> "$temp_file"
+            else
+                # no shebang, insert at beginning
+                echo "$start_marker" > "$temp_file"
+                echo "$BASHRC_INIT_BLOCK" >> "$temp_file"
+                echo "$end_marker" >> "$temp_file"
+                echo "" >> "$temp_file"
+                cat "$BASHRC_FILE" >> "$temp_file"
+            fi
+        else
+            # file doesn't exist or is empty, create new
+            echo "$start_marker" > "$temp_file"
+            echo "$BASHRC_INIT_BLOCK" >> "$temp_file"
+            echo "$end_marker" >> "$temp_file"
+        fi
+        
+        # replace original file with modified content
+        mv "$temp_file" "$BASHRC_FILE"
+        
+        # clean up multiple consecutive blank lines (keep only single blank lines)
+        local temp_clean
+        temp_clean=$(mktemp)
+        awk '/^[[:space:]]*$/ { if (!blank) print; blank=1; next } { blank=0; print }' "$BASHRC_FILE" > "$temp_clean"
+        mv "$temp_clean" "$BASHRC_FILE"
+        
         echo "bashrc.d initialization added to .bashrc"
     fi
 }
@@ -198,7 +233,7 @@ handle_existing_files() {
 
 echo ""
 echo "####################"
-echo "bash"
+echo "bash install"
 echo "####################"
 
 check_dependencies
