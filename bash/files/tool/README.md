@@ -106,6 +106,7 @@
 | reset | `rst` |
 | restart | `rsr` |
 | restore | `res` |
+| revoke | 'rvk' |
 | rollback | `rlb` |
 | rollout | `rlo` |
 | run | `rn` |
