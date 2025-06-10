@@ -39,7 +39,7 @@
 | checkout | `co` |
 | cherry-pick | `chp` |
 | clean/clear | `clr` |
-| clone | `cl` |
+| clone | `cln` |
 | commit | `cm` |
 | config/configure | `cfg` |
 | connect | `cn` |
