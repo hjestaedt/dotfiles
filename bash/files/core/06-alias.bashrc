@@ -74,6 +74,6 @@ alias timestamp='date +%s'
 if command -v fzf >/dev/null 2>&1; then
 	alias afz='alias | sed "s/alias //" | fzf --preview "echo {}" --preview-window=down:1' # | cut -d"=" -f1'
 	alias efz='env | fzf --preview "echo {}" --preview-window=down:1' # | cut -d"=" -f1'
-	alias fnez='fnls | fzf --preview "echo {}" --preview-window=down:1'
-	alias fnshez='type $(fnez)'
+	alias fnfz='fnls | fzf --preview "echo {}" --preview-window=down:1'
+	alias fnshfz='type $(fnez)'
 fi
