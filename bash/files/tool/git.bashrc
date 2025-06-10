@@ -50,7 +50,7 @@ if command_exists git; then
     alias glgg='git log --oneline --graph'
     alias glgs='git log --oneline --stat'
 
-    alias glgf='git log --oneline'
+    alias glgf='git log'
     alias glgfa='git log --all'
     alias glgfg='git log --graph'
     alias glgfs='git log --stat'
