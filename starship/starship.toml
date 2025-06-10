@@ -78,7 +78,7 @@ symbol = ''
 style = 'nord8'
 
 [gcloud]
-format = '[$symbol$project \($region\)]($style) '
+format = '[${symbol} $active(@$project) (\($region\))]($style) '
 symbol = '[☁](nord4) '
 style = 'bold nord10'
 disabled = false

@@ -7,6 +7,7 @@ help:
 	@echo "available targets:"
 	@echo "  install              install bash configuration"
 	@echo "  uninstall            uninstall bash configuration"
+	@echo "  update				  uninstall and install bash configuration"
 	@echo "  clean                remove all backup files"
 	@echo "  help                 show this help message"
 

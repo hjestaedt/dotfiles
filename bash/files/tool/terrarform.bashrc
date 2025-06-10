@@ -58,5 +58,40 @@ if command -v terraform >/dev/null 2>&1; then
     alias tfwsse="terraform workspace select"
 
     # terraform functions
-    # TODO: add functions
+
+    # tfdbl - disable terraform file by adding .disabled suffix
+    # description:
+    #   disable a terraform file by renaming it with a .disabled suffix
+    #   only adds suffix if not already present
+    # arguments:
+    #   file - name of the file to disable
+    # usage:
+    #   tfdbl <file>
+    #   e.g.: tfdbl main.tf, tfdbl variables.tf
+    tfdbl() {
+        [ -n "$1" ] || { echo "file argument required" >&2; return 1; }
+        [ -f "$1" ] || { echo "file $1 not found" >&2; return 1; }
+        case "$1" in
+            *.disabled) echo "file $1 is already disabled" >&2; return 1 ;;
+            *) mv "$1" "${1}.disabled" && echo "file $1 disabled" >&2 ;;
+        esac
+    }
+
+    # tfebl - enable terraform file by removing .disabled suffix
+    # description:
+    #   enable a terraform file by removing the .disabled suffix from its name
+    #   only removes suffix if present
+    # arguments:
+    #   file - name of the disabled file to enable
+    # usage:
+    #   tfebl <file>
+    #   e.g.: tfebl main.tf.disabled, tfebl variables.tf.disabled
+    tfebl() {
+        [ -n "$1" ] || { echo "file argument required" >&2; return 1; }
+        [ -f "$1" ] || { echo "file $1 not found" >&2; return 1; }
+        case "$1" in
+            *.disabled) mv "$1" "${1%%.disabled}" && echo "file $1 enabled" >&2 ;;
+            *) echo "file $1 does not have .disabled suffix" >&2; return 1 ;;
+        esac
+    }
 fi

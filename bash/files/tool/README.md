@@ -51,11 +51,13 @@
 | describe | `ds` |
 | destroy | `dst` |
 | diff | `df` |
+| disable | `dbl` |
 | doctor | `doc` |
 | down | `dn` |
 | drain | `drn` |
 | drop | `drp` |
 | edit | `ed` |
+| enable | `ebl` |
 | exec | `ex` |
 | export | `exp` |
 | expose | `ep` |
