@@ -12,35 +12,37 @@ $git_branch\
 $git_commit\
 $git_state\
 $git_status\
+$gcloud\
 $kubernetes\
 $docker_context\
-$gcloud\
+$terraform\
 $python\
 $jobs\
-$battery\
 $line_break\
+$battery\
 $container\
 $character"""
 
-[username]
-format = '[$user]($style)'
-style_root = 'bold nord11'
-style_user = 'bold nord5'
-
-[hostname] 
-ssh_only = true
-format = '@[$hostname]($style)  '
-style = 'bold nord5'
-
 [directory]
-format = '[$path]($style)  '
+format = '[$path]($style) '
 truncation_length = 8
 truncation_symbol = '…/'
 truncate_to_repo = false 
 style = 'bold nord9'
 
+[username]
+format = '[$user]($style)'
+style_root = 'bold nord11'
+style_user = 'nord10'
+show_always = false
+
+[hostname] 
+ssh_only = true
+format = '[@$hostname]($style)'
+style = 'nord10'
+
 [git_branch]
-format = '$symbol [$branch(:$remote_branch)]($style) '
+format = ' $symbol [$branch(:$remote_branch)]($style)'
 symbol = '󰘬'
 truncation_length = 64 
 truncation_symbol = '…'
@@ -48,48 +50,58 @@ style = 'nord8'
 disabled = false
 
 [git_commit]
-format = '[\($hash$tag\)]($style) '
+format = '[($tag)]($style) '
+only_detached = false
 tag_disabled = false
 tag_symbol = '  '
 style = 'nord8'
 disabled = false
 
 [git_state]
-style = 'nord8'
+style = 'nord6'
 disabled = false
 
 [git_status]
-format = '([\[$all_status$ahead_behind\]]($style) ) '
+format = '([\[$all_status$ahead_behind\]]($style) )'
+deleted = "x"
 ahead = 'a${count}'
-diverged = 'a${ahead_count}b${behind_count}'
 behind = 'b${count}'
-style = 'nord12'
+diverged = 'a${ahead_count}b${behind_count}'
+style = 'nord10'
+disabled = false
+
+[gcloud]
+format = ' ${symbol}[$active]($style) '
+symbol = '☁ '
+style = 'nord8'
 disabled = false
 
 [kubernetes]
 disabled = false
-format = '$symbol [$context([→](bold nord4)$namespace)]($style)  '
+format = ' $symbol [$context([→](bold nord4)$namespace)]($style) '
 symbol = '⎈'
 style = 'nord8'
 
 [docker_context]
-format = '$symbol [$context]($style)  '
+format = ' $symbol [$context]($style) '
 symbol = ''
 style = 'nord8'
 
-[gcloud]
-format = '[${symbol}$active]($style) '
-symbol = '[☁](nord4) '
-style = 'nord10'
-disabled = false
+[terraform]
+format = ' $symbol[$workspace]($style) '
+symbol = '󱁢 '
+style = 'nord8'
 
 [python]
-format = '[${symbol}${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
+format = ' ${symbol}[${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
 detect_extensions = ['py'] 
-detect_files = ['__init__.py', 'requirements.txt', 'setup.py']
+detect_files = ['requirements.txt']
+detect_folders = ['.venv']
+symbol = '󰌠 '
+style = 'nord8'
 
 [jobs] 
-format = '$symbol [$number]($style)  '
+format = ' $symbol [$number]($style) '
 symbol = ''
 style = 'nord8'
 number_threshold = 1
@@ -99,7 +111,7 @@ symbol_threshold = 1
 format = '$symbol [$percentage]($style) '
 
 [[battery.display]]
-threshold = 10 
+threshold = 10
 style = 'bold nord11'
 discharging_symbol = '󰁺'
 
@@ -114,32 +126,31 @@ symbol = ' '
 style = 'nord8'
 
 [character] 
-success_symbol = '[❯](bold nord10)'
+success_symbol = '[❯](bold nord6)'
 error_symbol = '[❯](bold nord11)'
-
 
 # color scheme nord
 [palettes.nord]
 # Polar Night
-nord0 = '#2E3440'
-nord1 = '#3B4252'
-nord2 = '#434C5E'
-nord3 = '#4C566A'
+nord0 = '#2E3440'  # Dark gray-blue
+nord1 = '#3B4252'  # Medium dark gray-blue
+nord2 = '#434C5E'  # Medium gray-blue
+nord3 = '#4C566A'  # Light gray-blue
 
 # Snow Storm
-nord4 = '#D8DEE9'
-nord5 = '#E5E9F0'
-nord6 = '#ECEFF4'
+nord4 = '#D8DEE9'  # Light blue-gray
+nord5 = '#E5E9F0'  # Very light blue-gray
+nord6 = '#ECEFF4'  # Off-white
 
 # Frost
-nord7 = '#8FBCBB'
-nord8 = '#88C0D0'
-nord9 = '#81A1C1'
-nord10 = '#5E81AC'
+nord7 = '#8FBCBB'  # Teal
+nord8 = '#88C0D0'  # Light blue
+nord9 = '#81A1C1'  # Medium blue
+nord10 = '#5E81AC' # Dark blue
 
 # Aurora
-nord11 = '#BF616A'  # Red accent
-nord12 = '#D08770'  # Orange accent
-nord13 = '#EBCB8B'  # Yellow accent
-nord14 = '#A3BE8C'  # Green  accent
-nord15 = '#B48EAD'  # Purple accent
+nord11 = '#BF616A' # Red
+nord12 = '#D08770' # Orange
+nord13 = '#EBCB8B' # Yellow
+nord14 = '#A3BE8C' # Green
+nord15 = '#B48EAD' # Purple

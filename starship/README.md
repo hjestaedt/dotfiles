@@ -15,3 +15,4 @@ OPTIONS:
 ## references
 
 https://starship.rs/
+https://starship.rs/config/
