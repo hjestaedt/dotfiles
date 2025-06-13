@@ -68,7 +68,7 @@ disabled = false
 
 [kubernetes]
 disabled = false
-format = '$symbol [$context( \($namespace\))]($style)  '
+format = '$symbol [$context([→](bold nord4)$namespace)]($style)  '
 symbol = '⎈'
 style = 'nord8'
 
@@ -78,9 +78,9 @@ symbol = ''
 style = 'nord8'
 
 [gcloud]
-format = '[${symbol} $active(/$project)(/$region)]($style) '
+format = '[${symbol}$active]($style) '
 symbol = '[☁](nord4) '
-style = 'bold nord10'
+style = 'nord10'
 disabled = false
 
 [python]
