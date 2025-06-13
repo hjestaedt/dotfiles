@@ -215,6 +215,7 @@
 | releases | `rel` |
 | replicasets | `rs` |
 | repositories | `repo` |
+| resource | `rsc`|
 | rolebindings | `rlb` |
 | roles | `rol` |
 | rules | `rul` |
