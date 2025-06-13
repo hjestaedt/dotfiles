@@ -40,3 +40,6 @@ augroup FileTypeSettings
     " Git commit message width
     autocmd FileType gitcommit setlocal textwidth=72
 augroup END
+
+" markdown syntax highlighting
+autocmd BufNewFile,BufFilePre,BufRead *.md set filetype=markdown.pandoc
