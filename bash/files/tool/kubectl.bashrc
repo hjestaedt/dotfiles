@@ -89,5 +89,49 @@ if command -v kubectl >/dev/null 2>&1; then
     alias kbgtpf="ps -ef | grep 'kubectl' | grep 'port-forward' | awk '{print \$(NF-1), \$NF}'"
 
     # kubectl functions
+
+	# kbrsccp - copy a kubernetes resource from one namespace to another
 	#
+	# description:
+	#   copies a Kubernetes resource from a source namespace to a target namespace.
+	#   automatically removes metadata fields that prevent recreation (resourceVersion,
+	#   uid, status) and updates the namespace field.
+	#
+	# arguments:
+	#   resource-kind - type of Kubernetes resource (e.g., deployment, service, configmap)
+	#   resource-name - name of the resource to copy
+	#   src-namespace - source namespace where the resource currently exists
+	#   target-namespace - target namespace where the resource will be copied
+	#
+	# usage:
+	#   kcopy <resource-kind> <resource-name> <src-namespace> <target-namespace>
+	#   e.g.: kcopy deployment my-app production staging
+	#   e.g.: kcopy service api-service default test
+	#   e.g.: kcopy configmap app-config prod dev
+	#
+	kbrsccp() {
+   		local resource_kind resource_name src_namespace target_namespace
+   
+   		resource_kind="$1"
+   		resource_name="$2"
+   		src_namespace="$3"
+   		target_namespace="$4"
+   
+   		if [ -z "$resource_kind" ] || [ -z "$resource_name" ] || [ -z "$src_namespace" ] || [ -z "$target_namespace" ]; then
+       		echo "usage: kcopy <resource-kind> <resource-name> <src-namespace> <target-namespace>" >&2
+       		return 1
+   		fi
+		
+		if kubectl get "$resource_kind" "$resource_name" -n "$target_namespace" >/dev/null 2>&1; then
+        	echo "warning: $resource_kind '$resource_name' already exists in namespace '$target_namespace'" >&2
+        	read -p "continue? (y/N): " -n 1 -r
+        	echo
+        	[[ ! $REPLY =~ ^[Yy]$ ]] && return 1
+    	fi
+   
+   		kubectl get "$resource_kind" "$resource_name" -n "$src_namespace" -o yaml | \
+       	yq eval ".metadata.namespace = \"$target_namespace\" | del(.metadata.resourceVersion) | del(.metadata.uid) | del(.status)" | \
+       	kubectl apply -f -
+	}
+
 fi
