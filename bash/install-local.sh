@@ -37,7 +37,8 @@ BASHRC_INIT_FILENAME="init.bashrc"
 
 # shellcheck disable=SC2016
 BASHRC_INIT_BLOCK='export BASHRC_HOME="$HOME/.bashrc.d"
-if [ -d "$BASHRC_HOME" ] && [ -r "$BASHRC_HOME"/init.bashrc ]; then . "$BASHRC_HOME"/init.bashrc; fi'
+if [ -d "$BASHRC_HOME" ] && [ -r "$BASHRC_HOME"/init.bashrc ]; then . "$BASHRC_HOME"/init.bashrc; fi
+if [ -f "$HOME/.localhost.bashrc" ]; then . "$HOME/.localhost.bashrc"; fi'
 
 ### functions
 
