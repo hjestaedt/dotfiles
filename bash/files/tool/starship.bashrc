@@ -4,13 +4,15 @@ if command -v starship >/dev/null 2>&1; then
 
     # starship aliases
 
-    alias ssp="starship"
-    alias ssptogcp="starship toggle gcloud"
-    alias ssptok8s="starship toggle kubernetes"
+    alias ssp='starship'
+    alias ssptogcl='starship toggle gcloud'
+    alias ssptokb='starship toggle kubernetes'
+	alias ssptotf='starship toggle terraform'
+	alias ssptodck='starship toggle docker_context'
 
 	# starship functions
 
-	ssptogit() {
+	ssptog() {
 		starship toggle git_branch
 		starship toggle git_commit
 		starship toggle git_state
