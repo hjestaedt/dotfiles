@@ -5,6 +5,7 @@ palette = 'nord'
 add_newline = true
 
 format = """
+$battery\
 $directory\
 $username\
 $hostname\
@@ -19,7 +20,6 @@ $terraform\
 $python\
 $jobs\
 $line_break\
-$battery\
 $container\
 $character"""
 
@@ -91,6 +91,7 @@ style = 'nord8'
 format = ' $symbol[$workspace]($style) '
 symbol = '󱁢 '
 style = 'nord8'
+disabled = false
 
 [python]
 format = ' ${symbol}[${pyenv_prefix}(${version} )(\($virtualenv\) )]($style)'
