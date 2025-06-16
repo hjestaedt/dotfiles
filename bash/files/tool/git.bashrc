@@ -31,6 +31,22 @@ if command_exists git; then
     alias gad.='git add .'
     alias gada='git add --all'
 
+	# git clean
+	# https://git-scm.com/docs/git-clean
+	alias gclr='git clean'
+	alias gclrf='git clean -f'
+	alias gclrfd='git clean -fd'
+	alias gclrfd='git clean -fd'
+
+	# git rm
+	# https://git-scm.com/docs/git-rm
+    alias grm='git rm'
+	alias grmf='git rm -f'
+	alias grmr='git rm -r'
+	alias grmrf='git rm -rf'
+    alias grmc='git rm --cached'
+    alias grmrc='git rm -r --cached'
+
     # git commit
     # https://git-scm.com/docs/git-commit
     alias gcm='git commit'
@@ -106,8 +122,6 @@ if command_exists git; then
 	alias gmgab='git merge --abort'
 	
 
-    alias grm='git rm'
-    alias grmc='git rm --cached'
     alias gcfg='git config'
     alias gcfgg='git config --global'
     alias gcfgl='git config --local'
