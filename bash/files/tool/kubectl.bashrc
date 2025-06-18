@@ -87,7 +87,7 @@ if command -v kubectl >/dev/null 2>&1; then
 
     alias kbrrr="kubectl rollout restart deployment"
     alias kbgtpf="ps -ef | grep 'kubectl' | grep 'port-forward' | awk '{print \$(NF-1), \$NF}'"
-
+	
     # kubectl functions
 
 	# kbrsccp - copy a kubernetes resource from one namespace to another
@@ -104,10 +104,10 @@ if command -v kubectl >/dev/null 2>&1; then
 	#   target-namespace - target namespace where the resource will be copied
 	#
 	# usage:
-	#   kcopy <resource-kind> <resource-name> <src-namespace> <target-namespace>
-	#   e.g.: kcopy deployment my-app production staging
-	#   e.g.: kcopy service api-service default test
-	#   e.g.: kcopy configmap app-config prod dev
+	#   kbrscp <resource-kind> <resource-name> <src-namespace> <target-namespace>
+	#   e.g.: kbrscp deployment my-app production staging
+	#   e.g.: kbrscp service api-service default test
+	#   e.g.: kbrscp copy configmap app-config prod dev
 	#
 	kbrsccp() {
    		local resource_kind resource_name src_namespace target_namespace
@@ -132,6 +132,25 @@ if command -v kubectl >/dev/null 2>&1; then
    		kubectl get "$resource_kind" "$resource_name" -n "$src_namespace" -o yaml | \
        	yq eval ".metadata.namespace = \"$target_namespace\" | del(.metadata.resourceVersion) | del(.metadata.uid) | del(.status)" | \
        	kubectl apply -f -
+	}
+
+
+    # kbessyn - for synchronization of an ExternalSecret resource
+    #
+    # description:
+    #   forces the synchronization of an ExternalSecret resource with the secret management system
+    #
+    # arguments:
+    #   external-secret-name - name of the ExternalSecret ressource
+    #
+    # usage:
+    #   kbessyn <external-secret-name> 
+	#
+	kbessyn() {
+		[ -n "$1" ] || { echo "ExternalSecret name argument required" >&2; return 1; }
+		local external_secret_name="$1"
+
+		kubectl annotate es $external_secret_name force-sync=$(date +%s) --overwrite
 	}
 
 fi

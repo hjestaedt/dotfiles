@@ -124,6 +124,7 @@
 | stop | `stp` |
 | submodule | `sub` |
 | switch | `sw` |
+| sync | `syn` |
 | system | `sys` |
 | tag | `tg` |
 | tail | `tl` |
