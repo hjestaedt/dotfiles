@@ -30,6 +30,12 @@ if command -v gcloud >/dev/null 2>&1; then
     alias gclcfgds='gcloud config configurations describe'
     alias gclcfgdl='gcloud config configurations delete'
 
+	alias gclcmpls='gcloud components list'
+	alias gclcmpupd='gcloud components update'
+	alias gclcmpist='gcloud components install'
+	alias gclcmprm='gcloud components remove'
+	alias gclcmprist='gcloud components reinstall'
+
     # gcloud functions
     # TODO: add functions
 fi

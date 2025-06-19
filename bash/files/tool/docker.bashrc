@@ -8,7 +8,7 @@ if command -v docker >/dev/null 2>&1; then
     alias dckctx='docker context'
     alias dckex='docker exec'
     alias dckimg='docker image'
-    alias dckis='docker inspect'
+    alias dckisp='docker inspect'
     alias dcklg='docker logs'
     alias dcknw='docker network'
     alias dckps='docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Image}}\t{{.Status}}"'

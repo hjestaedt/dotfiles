@@ -73,8 +73,8 @@
 | import | `imp` |
 | info | `inf` |
 | init | `ini` |
-| inspect | `is` |
-| install | `in` |
+| inspect | `isp`` |
+| install | `ist |
 | kustomize | `kz` |
 | label | `lbl` |
 | link | `ln` |
@@ -100,6 +100,7 @@
 | push | `psh` |
 | query | `qry` |
 | rebase | `rb` |
+| reinstall | `rist` |
 | refresh | `rfr` |
 | reflog | `rfl` |
 | remote | `rem` |
@@ -136,9 +137,10 @@
 | test | `tst` |
 | toggle | `to` |
 | top | `top` |
+| uninstall | `uist` |
 | unlock | `ulk` |
 | unset | `ust` |
-| untaint | `unt` |
+| untaint | `utnt` |
 | up | `up` |
 | update | `upd` |
 | upgrade | `upg` |
@@ -184,6 +186,7 @@
 | builds | `bld` |
 | charts | `cht` |
 | clusters | `cls` |
+| component(s) | `cmp` |
 | configmaps | `cm` |
 | containers | `ctr` |
 | cronjobs | `cj` |
