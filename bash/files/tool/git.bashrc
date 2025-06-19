@@ -22,8 +22,8 @@ if command_exists git; then
 
     # git status
     # https://git-scm.com/docs/git-status
-    alias gst='git status --show-stash'
-    alias gsts='git status -sb'
+    alias gsts='git status --show-stash'
+    alias gstss='git status -sb'
 
     # git add
     # https://git-scm.com/docs/git-add

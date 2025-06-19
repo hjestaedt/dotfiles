@@ -18,10 +18,17 @@ if command -v gcloud >/dev/null 2>&1; then
 	# gcloud config
 	# https://cloud.google.com/sdk/gcloud/reference/config
     alias gclcfg='gcloud config'
+	alias gclcfgls='gcloud config list'
+	alias gclcfgst='gcloud config set'
+	alias gclcfgust='gcloud config unset'
+	alias gclcfggt='gcloud config gt'
+
     alias gclcfgcf='gcloud config configurations'
-    alias gclcfgcfls='gcloud config configurations list'
-    alias gclcfgcfac='gcloud config configurations activate'
-    alias gclcfgcfds='gcloud config configurations describe'
+    alias gclcfglsa='gcloud config configurations list'
+    alias gclcfgac='gcloud config configurations activate'
+    alias gclcfgcr='gcloud config configurations create'
+    alias gclcfgds='gcloud config configurations describe'
+    alias gclcfgdl='gcloud config configurations delete'
 
     # gcloud functions
     # TODO: add functions

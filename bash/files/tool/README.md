@@ -116,11 +116,13 @@
 | search | `src` |
 | select | `se` |
 | service | `svc` |
+| set | `st` |
 | show | `sh` |
 | stack | `stk` |
 | start | `str` |
 | stash | `sth` |
-| state/status | `st` |
+| status | `sts` |
+| state| `stt` |
 | stop | `stp` |
 | submodule | `sub` |
 | switch | `sw` |
@@ -135,6 +137,7 @@
 | toggle | `to` |
 | top | `top` |
 | unlock | `ulk` |
+| unset | `ust` |
 | untaint | `unt` |
 | up | `up` |
 | update | `upd` |
@@ -226,8 +229,8 @@
 | serviceentries | `se` |
 | services | `svc` |
 | stacks | `stk` |
-| state | `st` |
-| statefulsets | `sts` |
+| state | `stt` |
+| statefulsets | `stts` |
 | subnets | `snw` |
 | tags | `tag` |
 | targets | `tgt` |

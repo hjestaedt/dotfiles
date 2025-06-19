@@ -43,9 +43,9 @@ if command -v terraform >/dev/null 2>&1; then
 
     # terraform state
     # https://developer.hashicorp.com/terraform/cli/commands/state
-    alias tfst="terraform state"
-    alias tfstls="terraform state list"
-    alias tfstsh="terraform state show"
+    alias tfstt="terraform state"
+    alias tfsttls="terraform state list"
+    alias tfsttsh="terraform state show"
 
     # terraform show
     # https://developer.hashicorp.com/terraform/cli/commands/show

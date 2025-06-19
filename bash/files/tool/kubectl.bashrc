@@ -47,9 +47,9 @@ if command -v kubectl >/dev/null 2>&1; then
     alias kbdsdp='kubectl describe deployment'
     alias kbdldp='kubectl delete deployment'
 
-    alias kbgtsts='kubectl get statefulset'
-    alias kbdssts='kubectl describe statefulset'
-    alias kbdlsts='kubectl delete statefulset'
+    alias kbgtstts='kubectl get statefulset'
+    alias kbdsstts='kubectl describe statefulset'
+    alias kbdlstts='kubectl delete statefulset'
 
     alias kbgtsvc='kubectl get service'
     alias kbdssvc='kubectl describe service'
