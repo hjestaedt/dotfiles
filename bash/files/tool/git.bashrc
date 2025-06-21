@@ -46,6 +46,20 @@ if command_exists git; then
 	alias grmrf='git rm -rf'
     alias grmc='git rm --cached'
     alias grmrc='git rm -r --cached'
+	
+	# git diff
+	#
+    # https://git-scm.com/docs/git-diff
+    alias gdf='git diff'
+    alias gdfs='git diff --staged'
+    alias gdft='git difftool'
+    alias gdfts='git difftool --staged'
+    if ((DELTA)); then
+    	alias gdfd='git diff | delta'
+    	alias gdfds='git diff | delta -s'
+	    alias gdfsd='git diff --staged | delta'
+		alias gdfsds='git diff --staged | delta -s'
+	fi
 
     # git commit
     # https://git-scm.com/docs/git-commit
@@ -128,11 +142,13 @@ if command_exists git; then
     alias gcln='git clone'
     alias gco='git checkout'
     alias gcob='git checkout -b'
-    alias gdf='git diff'
-    alias gdfs='git diff --staged'
-    alias gdft='git difftool'
-    alias gdfts='git difftool --staged'
-    alias gft='git fetch'
+
+	
+	
+	
+	
+	
+	alias gft='git fetch'
     alias gftp='git fetch --prune'
     alias gini='git init'
     alias gmv='git mv'
