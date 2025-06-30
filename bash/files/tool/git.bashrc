@@ -150,6 +150,17 @@ if command_exists git; then
     alias gsthls='git stash list'
     alias gsthpp='git stash pop'
 
+	# git pull
+    # https://git-scm.com/docs/git-pull
+    alias gpl='git pull'
+    alias gplrb='git pull --rebase'
+
+	# git push
+    # https://git-scm.com/docs/git-push
+    alias gpsh='git push'
+    alias gpshf='git push --force'
+    alias gpsht='git push --tags'
+
 
     alias gcfg='git config'
     alias gcfgg='git config --global'
@@ -162,10 +173,6 @@ if command_exists git; then
     alias gini='git init'
     alias gmv='git mv'
     alias gno='git notes'
-    alias gpl='git pull'
-    alias gplrb='git pull --rebase'
-    alias gpsh='git push'
-    alias gpshf='git push --force'
     alias grb='git rebase'
     alias grba='git rebase --abort'
     alias grbi='git rebase -i'
