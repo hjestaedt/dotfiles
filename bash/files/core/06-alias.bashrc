@@ -56,7 +56,8 @@ alias vi='vim'
 # system info & utilities
 alias cl='clear'
 alias h='history'
-alias path='echo -e ${PATH//:/\\n}'
+alias paths='echo -e ${PATH//:/\\n}'
+alias manpaths='echo -e ${MANPATH//:/\\n}'
 alias sui='sudo -i'
 alias sul='sudo su -l'
 alias fnls="declare -F | awk '{print \$NF}' | sort | grep -v -E '^_'" # print all user defined functions
