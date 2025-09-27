@@ -55,9 +55,9 @@ if command_exists git; then
     alias gdft='git difftool'
     alias gdfts='git difftool --staged'
     if ((DELTA)); then
-    	alias gdfd='git diff | delta'
-    	alias gdfds='git diff | delta -s'
-	    alias gdfsd='git diff --staged | delta'
+        alias gdfd='git diff | delta'
+        alias gdfds='git diff | delta -s'
+        alias gdfsd='git diff --staged | delta'
 		alias gdfsds='git diff --staged | delta -s'
 	fi
 
@@ -200,6 +200,44 @@ if command_exists git; then
             git pull --rebase &&
             git switch - &&
             git rebase "$1"
+    }
+
+    # gigt - fetch .gitignore templates from gitignore.io
+    # description:
+    #   fetches .gitignore templates from gitignore.io API and appends to .gitignore
+    #   skips if template already exists in file or if template is invalid
+    # arguments:
+    #   templates - one or more template names (space-separated)
+    # usage:
+    #   gitignore <template> [template...]
+    #   e.g.: gitignore python, gitignore python node visualstudiocode
+    gigt() {
+        [ -n "$1" ] || {
+            echo "error: template name required" >&2
+            echo "usage: gigt <template> [template...]" >&2
+            return 1
+        }
+
+        for template in "$@"; do
+            local response
+            response=$(curl -L -s "https://www.toptal.com/developers/gitignore/api/$template")
+
+            # check for errors
+            if echo "$response" | grep -q "ERROR:"; then
+                echo "error: template '$template' not found" >&2
+                continue
+            fi
+
+            # check for duplicates
+            if [ -f .gitignore ] && grep -qF "gitignore/api/$template" .gitignore; then
+                echo "skipped: template '$template' (already in .gitignore)"
+                continue
+            fi
+
+            # append to .gitignore
+            echo "$response" >> .gitignore
+            echo "added: template '$template'"
+        done
     }
 
     if ((FZF)); then
