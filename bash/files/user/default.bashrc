@@ -38,6 +38,6 @@ fi
 
 # replace ls (macos)
 if is_macos; then
-	MACOS_LS="$HOME/bin/macos-ls -F --color=auto --group-directories-first"
+	MACOS_LS="$HOME/bin/macls -F --color=auto --group-directories-first"
 	export MACOS_LS
 fi
